@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KB-Medic | صيدليتك الإلكترونية</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="api.js"></script>
+    <style>
+        :root {
+            --primary: #0e7490;
+            --primary-dark: #0c5c72;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --bg-light: #f0fdfa;
+        }
+        
+        [lang="ar"] { font-family: 'Cairo', sans-serif; }
+        [lang="fr"] { font-family: 'Poppins', sans-serif; }
+        
+        * { scroll-behavior: smooth; }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, #0e7490 0%, #10b981 100%);
+        }
+        
+        .gradient-hero {
+            background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #10b981 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+        
+        .product-card:hover .quick-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .quick-actions {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(14, 116, 144, 0.2);
+        }
+        
+        .toast {
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .pulse-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .marquee {
+            animation: marquee 20s linear infinite;
+        }
+        
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        [dir="ltr"] .marquee {
+            animation: marquee-ltr 20s linear infinite;
+        }
+        
+        @keyframes marquee-ltr {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+        
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .sidebar {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #10b981;
+            transition: width 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #0e7490;
+            box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.1);
+        }
+        
+        .brand-logo {
+            filter: grayscale(100%);
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        
+        .brand-logo:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #0e7490; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0c5c72; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-20 left-4 z-50 space-y-2"></div>
+
+    <!-- Top Announcement Bar -->
+    <div class="gradient-primary text-white py-2 text-sm overflow-hidden">
+        <div class="flex items-center justify-between max-w-7xl mx-auto px-4">
+            <div class="flex-1 overflow-hidden">
+                <p class="marquee whitespace-nowrap" data-ar="🎉 خصم 20% على جميع منتجات العناية بالبشرة! استخدم كود: SKIN20 | توصيل مجاني للطلبات فوق 500 دج" data-fr="🎉 -20% sur tous les produits de soins! Code: SKIN20 | Livraison gratuite +500 DA">
+                    🎉 خصم 20% على جميع منتجات العناية بالبشرة! استخدم كود: SKIN20 | توصيل مجاني للطلبات فوق 500 دج
+                </p>
+            </div>
+            <button onclick="toggleLanguage()" class="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full text-xs font-medium transition mr-4">
+                <i class="fas fa-globe"></i>
+                <span id="lang-toggle-text">FR</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="glass-effect sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3">
+            <div class="flex items-center justify-between gap-4">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2">
+                    <div class="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center">
+                        <i class="fas fa-prescription-bottle-medical text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-cyan-700" id="store-name">KB-Medic</h1>
+                        <p class="text-xs text-gray-500" data-ar="صيدليتك الإلكترونية" data-fr="Votre pharmacie en ligne">صيدليتك الإلكترونية</p>
+                    </div>
+                </a>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-xl hidden md:block">
+                    <div class="relative">
+                        <input type="text" id="search-input" 
+                            class="w-full bg-gray-100 border border-gray-200 rounded-full py-3 px-5 pr-12 text-sm"
+                            data-placeholder-ar="ابحث عن الأدوية والمنتجات الطبية..."
+                            data-placeholder-fr="Rechercher des médicaments..."
+                            placeholder="ابحث عن الأدوية والمنتجات الطبية...">
+                        <button class="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-600 hover:text-cyan-700">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-3">
+                    <!-- User Menu -->
+                    <div class="relative group">
+                        <button onclick="toggleUserMenu()" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-full transition">
+                            <i class="fas fa-user text-cyan-600"></i>
+                            <span class="hidden sm:inline text-sm font-medium" id="user-name" data-ar="حسابي" data-fr="Mon compte">حسابي</span>
+                        </button>
+                        <div id="user-dropdown" class="hidden absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border p-2 min-w-48 z-50">
+                            <div id="logged-out-menu">
+                                <button onclick="openModal('login-modal')" class="w-full text-right px-4 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2">
+                                    <i class="fas fa-sign-in-alt text-cyan-600"></i>
+                                    <span data-ar="تسجيل الدخول" data-fr="Connexion">تسجيل الدخول</span>
+                                </button>
+                                <button onclick="openModal('register-modal')" class="w-full text-right px-4 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2">
+                                    <i class="fas fa-user-plus text-green-600"></i>
+                                    <span data-ar="إنشاء حساب" data-fr="Créer un compte">إنشاء حساب</span>
+                                </button>
+                            </div>
+                            <div id="logged-in-menu" class="hidden">
+                                <button onclick="showSection('dashboard')" class="w-full text-right px-4 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2">
+                                    <i class="fas fa-tachometer-alt text-cyan-600"></i>
+                                    <span data-ar="لوحة التحكم" data-fr="Tableau de bord">لوحة التحكم</span>
+                                </button>
+                                <button onclick="showSection('orders')" class="w-full text-right px-4 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2">
+                                    <i class="fas fa-box text-orange-600"></i>
+                                    <span data-ar="طلباتي" data-fr="Mes commandes">طلباتي</span>
+                                </button>
+                                <button onclick="showSection('wishlist')" class="w-full text-right px-4 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2">
+                                    <i class="fas fa-heart text-red-500"></i>
+                                    <span data-ar="المفضلة" data-fr="Favoris">المفضلة</span>
+                                </button>
+                                <button onclick="showSection('loyalty')" class="w-full text-right px-4 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2">
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <span data-ar="نقاط الولاء" data-fr="Points fidélité">نقاط الولاء</span>
+                                </button>
+                                <hr class="my-2">
+                                <button onclick="logout()" class="w-full text-right px-4 py-2 hover:bg-red-50 rounded-lg text-sm flex items-center gap-2 text-red-600">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span data-ar="تسجيل الخروج" data-fr="Déconnexion">تسجيل الخروج</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wishlist -->
+                    <button onclick="showSection('wishlist')" class="relative bg-gray-100 hover:bg-gray-200 p-3 rounded-full transition">
+                        <i class="fas fa-heart text-gray-600"></i>
+                        <span id="wishlist-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
+                    </button>
+
+                    <!-- Cart -->
+                    <button onclick="toggleCart()" class="relative gradient-primary text-white px-4 py-2 rounded-full flex items-center gap-2 hover:shadow-lg transition">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="hidden sm:inline text-sm font-medium" data-ar="السلة" data-fr="Panier">السلة</span>
+                        <span id="cart-count" class="bg-white text-cyan-600 text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+                    </button>
+
+                    <!-- Mobile Menu -->
+                    <button onclick="toggleMobileMenu()" class="md:hidden bg-gray-100 p-3 rounded-full">
+                        <i class="fas fa-bars text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="hidden md:flex items-center gap-6 mt-4 border-t pt-4">
+                <a href="#" onclick="filterProducts('all'); return false;" class="nav-link relative text-sm font-medium text-gray-700 hover:text-cyan-600 transition" data-ar="الرئيسية" data-fr="Accueil">الرئيسية</a>
+                <a href="#products" onclick="filterProducts('medicines'); return false;" class="nav-link relative text-sm font-medium text-gray-700 hover:text-cyan-600 transition" data-ar="الأدوية" data-fr="Médicaments">الأدوية</a>
+                <a href="#products" onclick="filterProducts('skincare'); return false;" class="nav-link relative text-sm font-medium text-gray-700 hover:text-cyan-600 transition" data-ar="العناية بالبشرة" data-fr="Soins de la peau">العناية بالبشرة</a>
+                <a href="#products" onclick="filterProducts('vitamins'); return false;" class="nav-link relative text-sm font-medium text-gray-700 hover:text-cyan-600 transition" data-ar="الفيتامينات" data-fr="Vitamines">الفيتامينات</a>
+                <a href="#products" onclick="filterProducts('baby'); return false;" class="nav-link relative text-sm font-medium text-gray-700 hover:text-cyan-600 transition" data-ar="منتجات الأطفال" data-fr="Bébé">منتجات الأطفال</a>
+                <a href="#products" onclick="filterProducts('equipment'); return false;" class="nav-link relative text-sm font-medium text-gray-700 hover:text-cyan-600 transition" data-ar="الأجهزة الطبية" data-fr="Équipements">الأجهزة الطبية</a>
+                <a href="#brands" class="nav-link relative text-sm font-medium text-gray-700 hover:text-cyan-600 transition" data-ar="الماركات" data-fr="Marques">الماركات</a>
+                <a href="#contact" class="nav-link relative text-sm font-medium text-gray-700 hover:text-cyan-600 transition" data-ar="اتصل بنا" data-fr="Contact">اتصل بنا</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Sidebar -->
+    <div id="mobile-menu" class="sidebar fixed inset-y-0 right-0 w-80 bg-white shadow-2xl z-50 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold text-cyan-700" data-ar="القائمة" data-fr="Menu">القائمة</h3>
+            <button onclick="toggleMobileMenu()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Search -->
+        <div class="relative mb-6">
+            <input type="text" class="w-full bg-gray-100 border rounded-full py-3 px-5 pr-12 text-sm"
+                data-placeholder-ar="ابحث..." data-placeholder-fr="Rechercher..."
+                placeholder="ابحث...">
+            <button class="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-600">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        
+        <nav class="space-y-2">
+            <a href="#" onclick="filterProducts('all'); toggleMobileMenu(); return false;" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-cyan-50 text-gray-700">
+                <i class="fas fa-home text-cyan-600"></i>
+                <span data-ar="الرئيسية" data-fr="Accueil">الرئيسية</span>
+            </a>
+            <a href="#products" onclick="filterProducts('medicines'); toggleMobileMenu(); return false;" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-cyan-50 text-gray-700">
+                <i class="fas fa-pills text-cyan-600"></i>
+                <span data-ar="الأدوية" data-fr="Médicaments">الأدوية</span>
+            </a>
+            <a href="#products" onclick="filterProducts('skincare'); toggleMobileMenu(); return false;" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-cyan-50 text-gray-700">
+                <i class="fas fa-spa text-cyan-600"></i>
+                <span data-ar="العناية بالبشرة" data-fr="Soins">العناية بالبشرة</span>
+            </a>
+            <a href="#products" onclick="filterProducts('vitamins'); toggleMobileMenu(); return false;" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-cyan-50 text-gray-700">
+                <i class="fas fa-capsules text-cyan-600"></i>
+                <span data-ar="الفيتامينات" data-fr="Vitamines">الفيتامينات</span>
+            </a>
+            <a href="#products" onclick="filterProducts('baby'); toggleMobileMenu(); return false;" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-cyan-50 text-gray-700">
+                <i class="fas fa-baby text-cyan-600"></i>
+                <span data-ar="منتجات الأطفال" data-fr="Bébé">منتجات الأطفال</span>
+            </a>
+            <a href="#contact" onclick="toggleMobileMenu()" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-cyan-50 text-gray-700">
+                <i class="fas fa-envelope text-cyan-600"></i>
+                <span data-ar="اتصل بنا" data-fr="Contact">اتصل بنا</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="sidebar fixed inset-y-0 right-0 w-96 bg-white shadow-2xl z-50 flex flex-col">
+        <div class="p-6 border-b">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-cyan-700 flex items-center gap-2">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span data-ar="سلة التسوق" data-fr="Panier">سلة التسوق</span>
+                </h3>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <!-- Cart items will be injected here -->
+        </div>
+        
+        <div id="cart-empty" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+            <i class="fas fa-shopping-basket text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500" data-ar="سلة التسوق فارغة" data-fr="Votre panier est vide">سلة التسوق فارغة</p>
+            <button onclick="toggleCart()" class="mt-4 text-cyan-600 hover:text-cyan-700 font-medium" data-ar="تصفح المنتجات" data-fr="Parcourir les produits">تصفح المنتجات</button>
+        </div>
+        
+        <div id="cart-footer" class="hidden border-t p-6 space-y-4">
+            <div class="flex justify-between text-lg font-bold">
+                <span data-ar="المجموع:" data-fr="Total:">المجموع:</span>
+                <span id="cart-total">0 دج</span>
+            </div>
+            <button onclick="openCheckoutModal()" class="w-full gradient-primary text-white py-3 rounded-xl font-bold hover:shadow-lg transition flex items-center justify-center gap-2">
+                <i class="fas fa-credit-card"></i>
+                <span data-ar="إتمام الطلب" data-fr="Commander">إتمام الطلب</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="overlay" onclick="closeAll()" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section class="gradient-hero text-white py-16 md:py-24 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-10 right-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+                <div class="absolute bottom-10 left-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+            </div>
+            <div class="max-w-7xl mx-auto px-4 relative">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-6">
+                        <div class="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full text-sm">
+                            <i class="fas fa-star text-yellow-300"></i>
+                            <span data-ar="أكثر من 10,000 عميل سعيد" data-fr="Plus de 10 000 clients satisfaits">أكثر من 10,000 عميل سعيد</span>
+                        </div>
+                        <h2 class="text-4xl md:text-5xl font-bold leading-tight" data-ar="صحتك أولويتنا القصوى" data-fr="Votre santé, notre priorité">
+                            صحتك أولويتنا القصوى
+                        </h2>
+                        <p class="text-lg opacity-90" data-ar="اكتشف مجموعة واسعة من المنتجات الطبية والعناية بالصحة مع خدمة توصيل سريعة لباب منزلك" data-fr="Découvrez une large gamme de produits médicaux avec livraison rapide à domicile">
+                            اكتشف مجموعة واسعة من المنتجات الطبية والعناية بالصحة مع خدمة توصيل سريعة لباب منزلك
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="#products" onclick="filterProducts('all'); return false;" class="bg-white text-cyan-600 px-8 py-3 rounded-full font-bold hover:shadow-xl transition flex items-center gap-2">
+                                <span data-ar="تسوق الآن" data-fr="Acheter maintenant">تسوق الآن</span>
+                                <i class="fas fa-arrow-left"></i>
+                            </a>
+                            <a href="#categories" class="border-2 border-white text-white px-8 py-3 rounded-full font-bold hover:bg-white hover:text-cyan-600 transition" data-ar="تصفح الفئات" data-fr="Parcourir">
+                                تصفح الفئات
+                            </a>
+                        </div>
+                    </div>
+                    <div class="relative hidden md:block">
+                        <div class="bg-white/10 rounded-3xl p-8 backdrop-blur-sm">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-white/20 rounded-2xl p-6 text-center">
+                                    <i class="fas fa-truck text-4xl mb-3"></i>
+                                    <p class="font-bold" data-ar="توصيل سريع" data-fr="Livraison rapide">توصيل سريع</p>
+                                    <p class="text-sm opacity-80" data-ar="خلال 24 ساعة" data-fr="Sous 24h">خلال 24 ساعة</p>
+                                </div>
+                                <div class="bg-white/20 rounded-2xl p-6 text-center">
+                                    <i class="fas fa-shield-alt text-4xl mb-3"></i>
+                                    <p class="font-bold" data-ar="منتجات أصلية" data-fr="Produits originaux">منتجات أصلية</p>
+                                    <p class="text-sm opacity-80" data-ar="100% مضمونة" data-fr="100% garantis">100% مضمونة</p>
+                                </div>
+                                <div class="bg-white/20 rounded-2xl p-6 text-center">
+                                    <i class="fas fa-headset text-4xl mb-3"></i>
+                                    <p class="font-bold" data-ar="دعم 24/7" data-fr="Support 24/7">دعم 24/7</p>
+                                    <p class="text-sm opacity-80" data-ar="نحن هنا دائماً" data-fr="Toujours là">نحن هنا دائماً</p>
+                                </div>
+                                <div class="bg-white/20 rounded-2xl p-6 text-center">
+                                    <i class="fas fa-undo text-4xl mb-3"></i>
+                                    <p class="font-bold" data-ar="إرجاع سهل" data-fr="Retour facile">إرجاع سهل</p>
+                                    <p class="text-sm opacity-80" data-ar="خلال 14 يوم" data-fr="Sous 14 jours">خلال 14 يوم</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Bar -->
+        <section class="bg-white py-6 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="flex items-center gap-3 p-4 bg-cyan-50 rounded-xl">
+                        <div class="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-truck text-cyan-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-cyan-700" data-ar="توصيل سريع" data-fr="Livraison rapide">توصيل سريع</p>
+                            <p class="text-xs text-gray-500" data-ar="لكل أنحاء الجزائر" data-fr="Partout en Algérie">لكل أنحاء الجزائر</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-4 bg-green-50 rounded-xl">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-green-700" data-ar="ضمان الجودة" data-fr="Qualité garantie">ضمان الجودة</p>
+                            <p class="text-xs text-gray-500" data-ar="منتجات معتمدة" data-fr="Produits certifiés">منتجات معتمدة</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-4 bg-orange-50 rounded-xl">
+                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-headset text-orange-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-orange-700" data-ar="دعم فني" data-fr="Support">دعم فني</p>
+                            <p class="text-xs text-gray-500" data-ar="متاح 24/7" data-fr="Disponible 24/7">متاح 24/7</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-4 bg-purple-50 rounded-xl">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-wallet text-purple-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-purple-700" data-ar="الدفع عند الاستلام" data-fr="Paiement à la livraison">الدفع عند الاستلام</p>
+                            <p class="text-xs text-gray-500" data-ar="آمن ومضمون" data-fr="Sécurisé">آمن ومضمون</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section id="categories" class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-3" data-ar="تصفح الفئات" data-fr="Parcourir les catégories">تصفح الفئات</h2>
+                    <p class="text-gray-500" data-ar="اختر من بين مجموعة واسعة من المنتجات الطبية" data-fr="Choisissez parmi une large gamme de produits médicaux">اختر من بين مجموعة واسعة من المنتجات الطبية</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <button onclick="filterProducts('medicines')" class="category-card bg-white p-6 rounded-2xl text-center hover:shadow-xl transition group">
+                        <div class="w-16 h-16 bg-cyan-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-cyan-600 transition">
+                            <i class="fas fa-pills text-3xl text-cyan-600 group-hover:text-white transition"></i>
+                        </div>
+                        <p class="font-bold text-gray-700" data-ar="الأدوية" data-fr="Médicaments">الأدوية</p>
+                        <p class="text-xs text-gray-400 mt-1" data-ar="150+ منتج" data-fr="150+ produits">150+ منتج</p>
+                    </button>
+                    <button onclick="filterProducts('skincare')" class="category-card bg-white p-6 rounded-2xl text-center hover:shadow-xl transition group">
+                        <div class="w-16 h-16 bg-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-pink-600 transition">
+                            <i class="fas fa-spa text-3xl text-pink-600 group-hover:text-white transition"></i>
+                        </div>
+                        <p class="font-bold text-gray-700" data-ar="العناية بالبشرة" data-fr="Soins">العناية بالبشرة</p>
+                        <p class="text-xs text-gray-400 mt-1" data-ar="200+ منتج" data-fr="200+ produits">200+ منتج</p>
+                    </button>
+                    <button onclick="filterProducts('vitamins')" class="category-card bg-white p-6 rounded-2xl text-center hover:shadow-xl transition group">
+                        <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-orange-600 transition">
+                            <i class="fas fa-capsules text-3xl text-orange-600 group-hover:text-white transition"></i>
+                        </div>
+                        <p class="font-bold text-gray-700" data-ar="الفيتامينات" data-fr="Vitamines">الفيتامينات</p>
+                        <p class="text-xs text-gray-400 mt-1" data-ar="80+ منتج" data-fr="80+ produits">80+ منتج</p>
+                    </button>
+                    <button onclick="filterProducts('baby')" class="category-card bg-white p-6 rounded-2xl text-center hover:shadow-xl transition group">
+                        <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-600 transition">
+                            <i class="fas fa-baby text-3xl text-blue-600 group-hover:text-white transition"></i>
+                        </div>
+                        <p class="font-bold text-gray-700" data-ar="منتجات الأطفال" data-fr="Bébé">منتجات الأطفال</p>
+                        <p class="text-xs text-gray-400 mt-1" data-ar="120+ منتج" data-fr="120+ produits">120+ منتج</p>
+                    </button>
+                    <button onclick="filterProducts('equipment')" class="category-card bg-white p-6 rounded-2xl text-center hover:shadow-xl transition group">
+                        <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-green-600 transition">
+                            <i class="fas fa-heartbeat text-3xl text-green-600 group-hover:text-white transition"></i>
+                        </div>
+                        <p class="font-bold text-gray-700" data-ar="الأجهزة الطبية" data-fr="Équipements">الأجهزة الطبية</p>
+                        <p class="text-xs text-gray-400 mt-1" data-ar="50+ منتج" data-fr="50+ produits">50+ منتج</p>
+                    </button>
+                    <button onclick="filterProducts('hygiene')" class="category-card bg-white p-6 rounded-2xl text-center hover:shadow-xl transition group">
+                        <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-600 transition">
+                            <i class="fas fa-hand-sparkles text-3xl text-purple-600 group-hover:text-white transition"></i>
+                        </div>
+                        <p class="font-bold text-gray-700" data-ar="النظافة" data-fr="Hygiène">النظافة</p>
+                        <p class="text-xs text-gray-400 mt-1" data-ar="100+ منتج" data-fr="100+ produits">100+ منتج</p>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2" data-ar="منتجاتنا المميزة" data-fr="Nos produits phares">منتجاتنا المميزة</h2>
+                        <p class="text-gray-500" data-ar="اكتشف أفضل المنتجات الطبية" data-fr="Découvrez les meilleurs produits médicaux">اكتشف أفضل المنتجات الطبية</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <select id="sort-select" onchange="sortProducts()" class="bg-gray-100 border-0 rounded-xl px-4 py-2 text-sm">
+                            <option value="default" data-ar="الترتيب الافتراضي" data-fr="Tri par défaut">الترتيب الافتراضي</option>
+                            <option value="price-low" data-ar="السعر: الأقل أولاً" data-fr="Prix croissant">السعر: الأقل أولاً</option>
+                            <option value="price-high" data-ar="السعر: الأعلى أولاً" data-fr="Prix décroissant">السعر: الأعلى أولاً</option>
+                            <option value="name" data-ar="الاسم" data-fr="Nom">الاسم</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Filter Tabs -->
+                <div class="flex flex-wrap gap-2 mb-8">
+                    <button onclick="filterProducts('all')" class="filter-btn active px-5 py-2 rounded-full text-sm font-medium bg-cyan-600 text-white" data-ar="الكل" data-fr="Tous">الكل</button>
+                    <button onclick="filterProducts('medicines')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200" data-ar="الأدوية" data-fr="Médicaments">الأدوية</button>
+                    <button onclick="filterProducts('skincare')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200" data-ar="العناية بالبشرة" data-fr="Soins">العناية بالبشرة</button>
+                    <button onclick="filterProducts('vitamins')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200" data-ar="الفيتامينات" data-fr="Vitamines">الفيتامينات</button>
+                    <button onclick="filterProducts('baby')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200" data-ar="الأطفال" data-fr="Bébé">الأطفال</button>
+                    <button onclick="filterProducts('equipment')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200" data-ar="الأجهزة" data-fr="Équipements">الأجهزة</button>
+                </div>
+
+                <!-- Products Grid -->
+                <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <!-- Products will be injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Promo Banner -->
+        <section class="py-12">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="gradient-primary rounded-3xl p-8 md:p-12 text-white relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                    <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full translate-x-1/2 translate-y-1/2"></div>
+                    <div class="relative grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <span class="inline-block bg-white/20 px-4 py-1 rounded-full text-sm mb-4" data-ar="عرض محدود" data-fr="Offre limitée">عرض محدود</span>
+                            <h3 class="text-3xl md:text-4xl font-bold mb-4" data-ar="خصم 30% على الفيتامينات" data-fr="-30% sur les vitamines">خصم 30% على الفيتامينات</h3>
+                            <p class="opacity-90 mb-6" data-ar="استخدم كود: VIT30 عند الدفع واحصل على خصم 30% على جميع منتجات الفيتامينات والمكملات الغذائية" data-fr="Utilisez le code VIT30 pour obtenir -30% sur toutes les vitamines">
+                                استخدم كود: VIT30 عند الدفع واحصل على خصم 30% على جميع منتجات الفيتامينات والمكملات الغذائية
+                            </p>
+                            <button onclick="filterProducts('vitamins')" class="bg-white text-cyan-600 px-8 py-3 rounded-full font-bold hover:shadow-xl transition" data-ar="تسوق الآن" data-fr="Acheter">
+                                تسوق الآن
+                            </button>
+                        </div>
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-48 h-48 bg-white/20 rounded-full">
+                                <i class="fas fa-capsules text-8xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Brands Section -->
+        <section id="brands" class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-3" data-ar="الماركات المعتمدة" data-fr="Marques certifiées">الماركات المعتمدة</h2>
+                    <p class="text-gray-500" data-ar="نعمل مع أفضل العلامات التجارية العالمية" data-fr="Nous travaillons avec les meilleures marques">نعمل مع أفضل العلامات التجارية العالمية</p>
+                </div>
+                <div class="grid grid-cols-3 md:grid-cols-6 gap-6">
+                    <div class="bg-white p-6 rounded-xl flex items-center justify-center brand-logo cursor-pointer">
+                        <span class="text-2xl font-bold text-gray-400">Bioderma</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl flex items-center justify-center brand-logo cursor-pointer">
+                        <span class="text-2xl font-bold text-gray-400">La Roche-Posay</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl flex items-center justify-center brand-logo cursor-pointer">
+                        <span class="text-2xl font-bold text-gray-400">Vichy</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl flex items-center justify-center brand-logo cursor-pointer">
+                        <span class="text-2xl font-bold text-gray-400">Avène</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl flex items-center justify-center brand-logo cursor-pointer">
+                        <span class="text-2xl font-bold text-gray-400">Eucerin</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl flex items-center justify-center brand-logo cursor-pointer">
+                        <span class="text-2xl font-bold text-gray-400">CeraVe</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-6" data-ar="تواصل معنا" data-fr="Contactez-nous">تواصل معنا</h2>
+                        <p class="text-gray-500 mb-8" data-ar="نحن هنا لمساعدتك. أرسل لنا رسالتك وسنرد عليك في أقرب وقت ممكن." data-fr="Nous sommes là pour vous aider. Envoyez-nous votre message.">
+                            نحن هنا لمساعدتك. أرسل لنا رسالتك وسنرد عليك في أقرب وقت ممكن.
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-map-marker-alt text-cyan-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-700" data-ar="العنوان" data-fr="Adresse">العنوان</p>
+                                    <p class="text-gray-500" data-ar="الجزائر العاصمة، حي الأعمال" data-fr="Alger, Quartier des Affaires">الجزائر العاصمة، حي الأعمال</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-phone text-cyan-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-700" data-ar="الهاتف" data-fr="Téléphone">الهاتف</p>
+                                    <p class="text-gray-500" dir="ltr">+213 555 123 456</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-envelope text-cyan-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-700" data-ar="البريد الإلكتروني" data-fr="Email">البريد الإلكتروني</p>
+                                    <p class="text-gray-500">contact@kb-medic.com</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-4 mt-8">
+                            <a href="#" class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 hover:bg-cyan-600 hover:text-white transition">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 hover:bg-cyan-600 hover:text-white transition">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 hover:bg-cyan-600 hover:text-white transition">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 hover:bg-cyan-600 hover:text-white transition">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-8 rounded-2xl">
+                        <form id="contact-form" onsubmit="submitContact(event)">
+                            <div class="grid gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="الاسم الكامل" data-fr="Nom complet">الاسم الكامل</label>
+                                    <input type="text" required class="w-full bg-white border border-gray-200 rounded-xl py-3 px-4" data-placeholder-ar="أدخل اسمك" data-placeholder-fr="Votre nom" placeholder="أدخل اسمك">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="البريد الإلكتروني" data-fr="Email">البريد الإلكتروني</label>
+                                    <input type="email" required class="w-full bg-white border border-gray-200 rounded-xl py-3 px-4" placeholder="example@email.com">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="رقم الهاتف" data-fr="Téléphone">رقم الهاتف</label>
+                                    <input type="tel" class="w-full bg-white border border-gray-200 rounded-xl py-3 px-4" placeholder="+213 5XX XXX XXX">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="الرسالة" data-fr="Message">الرسالة</label>
+                                    <textarea rows="4" required class="w-full bg-white border border-gray-200 rounded-xl py-3 px-4 resize-none" data-placeholder-ar="اكتب رسالتك هنا..." data-placeholder-fr="Écrivez votre message..." placeholder="اكتب رسالتك هنا..."></textarea>
+                                </div>
+                                <button type="submit" class="gradient-primary text-white py-3 rounded-xl font-bold hover:shadow-lg transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span data-ar="إرسال الرسالة" data-fr="Envoyer">إرسال الرسالة</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Dashboard Section (Hidden by default) -->
+    <section id="dashboard-section" class="hidden py-8 bg-gray-50 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800" data-ar="لوحة التحكم" data-fr="Tableau de bord">لوحة التحكم</h2>
+                    <p class="text-gray-500" data-ar="مرحباً بك في حسابك" data-fr="Bienvenue dans votre compte">مرحباً بك في حسابك</p>
+                </div>
+                <button onclick="showSection('home')" class="text-cyan-600 hover:text-cyan-700 flex items-center gap-2">
+                    <i class="fas fa-arrow-right"></i>
+                    <span data-ar="العودة للمتجر" data-fr="Retour à la boutique">العودة للمتجر</span>
+                </button>
+            </div>
+
+            <!-- Dashboard Tabs -->
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button onclick="showDashboardTab('overview', event)" class="dash-tab active px-4 py-2 rounded-lg text-sm font-medium bg-cyan-600 text-white" data-ar="نظرة عامة" data-fr="Aperçu">نظرة عامة</button>
+                <button onclick="showDashboardTab('my-orders', event)" class="dash-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700" data-ar="طلباتي" data-fr="Mes commandes">طلباتي</button>
+                <button onclick="showDashboardTab('my-wishlist', event)" class="dash-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700" data-ar="المفضلة" data-fr="Favoris">المفضلة</button>
+                <button onclick="showDashboardTab('my-loyalty', event)" class="dash-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700" data-ar="نقاط الولاء" data-fr="Fidélité">نقاط الولاء</button>
+                <button onclick="showDashboardTab('my-profile', event)" class="dash-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700" data-ar="حسابي" data-fr="Mon profil">حسابي</button>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="dash-overview" class="dash-content">
+                <div class="grid md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-box text-cyan-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-gray-800" id="total-orders">0</p>
+                                <p class="text-sm text-gray-500" data-ar="إجمالي الطلبات" data-fr="Total commandes">إجمالي الطلبات</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-check-circle text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-gray-800" id="delivered-orders">0</p>
+                                <p class="text-sm text-gray-500" data-ar="تم التوصيل" data-fr="Livrées">تم التوصيل</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-star text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-gray-800" id="loyalty-points">0</p>
+                                <p class="text-sm text-gray-500" data-ar="نقاط الولاء" data-fr="Points fidélité">نقاط الولاء</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-heart text-red-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-gray-800" id="wishlist-total">0</p>
+                                <p class="text-sm text-gray-500" data-ar="في المفضلة" data-fr="Dans favoris">في المفضلة</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="dash-my-orders" class="dash-content hidden">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="p-6 border-b">
+                        <h3 class="font-bold text-gray-800" data-ar="سجل الطلبات" data-fr="Historique des commandes">سجل الطلبات</h3>
+                    </div>
+                    <div id="orders-list" class="divide-y">
+                        <!-- Orders will be injected here -->
+                    </div>
+                    <div id="no-orders" class="hidden p-12 text-center">
+                        <i class="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500" data-ar="لا توجد طلبات بعد" data-fr="Aucune commande">لا توجد طلبات بعد</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wishlist Tab -->
+            <div id="dash-my-wishlist" class="dash-content hidden">
+                <div id="wishlist-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Wishlist items will be injected here -->
+                </div>
+                <div id="no-wishlist" class="hidden bg-white rounded-xl p-12 text-center">
+                    <i class="fas fa-heart text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500" data-ar="المفضلة فارغة" data-fr="Aucun favori">المفضلة فارغة</p>
+                </div>
+            </div>
+
+            <!-- Loyalty Tab -->
+            <div id="dash-my-loyalty" class="dash-content hidden">
+                <div class="bg-white rounded-xl shadow-sm p-8">
+                    <div class="text-center mb-8">
+                        <div class="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-crown text-yellow-600 text-4xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2" data-ar="نقاط الولاء الخاصة بك" data-fr="Vos points fidélité">نقاط الولاء الخاصة بك</h3>
+                        <p class="text-4xl font-bold text-cyan-600" id="loyalty-points-display">0</p>
+                        <p class="text-gray-500 mt-2" data-ar="نقطة" data-fr="points">نقطة</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h4 class="font-bold text-gray-800 mb-4" data-ar="كيف تكسب النقاط؟" data-fr="Comment gagner des points?">كيف تكسب النقاط؟</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span data-ar="1 نقطة لكل 100 دج من المشتريات" data-fr="1 point pour chaque 100 DA d'achat">1 نقطة لكل 100 دج من المشتريات</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span data-ar="50 نقطة عند التسجيل" data-fr="50 points à l'inscription">50 نقطة عند التسجيل</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span data-ar="20 نقطة لكل تقييم" data-fr="20 points par avis">20 نقطة لكل تقييم</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="dash-my-profile" class="dash-content hidden">
+                <div class="bg-white rounded-xl shadow-sm p-8">
+                    <h3 class="font-bold text-gray-800 mb-6" data-ar="معلومات الحساب" data-fr="Informations du compte">معلومات الحساب</h3>
+                    <form id="profile-form" class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="الاسم" data-fr="Nom">الاسم</label>
+                            <input type="text" id="profile-name" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="البريد الإلكتروني" data-fr="Email">البريد الإلكتروني</label>
+                            <input type="email" id="profile-email" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="الهاتف" data-fr="Téléphone">الهاتف</label>
+                            <input type="tel" id="profile-phone" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="العنوان" data-fr="Adresse">العنوان</label>
+                            <input type="text" id="profile-address" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4">
+                        </div>
+                        <div class="md:col-span-2">
+                            <button type="submit" class="gradient-primary text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg transition" data-ar="حفظ التغييرات" data-fr="Enregistrer">
+                                حفظ التغييرات
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
+                            <i class="fas fa-prescription-bottle-medical text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">KB-Medic</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4" data-ar="صيدليتك الإلكترونية الموثوقة. نقدم لك أفضل المنتجات الطبية والعناية بالصحة." data-fr="Votre pharmacie en ligne de confiance.">
+                        صيدليتك الإلكترونية الموثوقة. نقدم لك أفضل المنتجات الطبية والعناية بالصحة.
+                    </p>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-cyan-600 transition">
+                            <i class="fab fa-facebook-f text-sm"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-cyan-600 transition">
+                            <i class="fab fa-instagram text-sm"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-cyan-600 transition">
+                            <i class="fab fa-whatsapp text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4" data-ar="روابط سريعة" data-fr="Liens rapides">روابط سريعة</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" onclick="filterProducts('all'); return false;" class="hover:text-white transition" data-ar="الرئيسية" data-fr="Accueil">الرئيسية</a></li>
+                        <li><a href="#products" onclick="filterProducts('all'); return false;" class="hover:text-white transition" data-ar="المنتجات" data-fr="Produits">المنتجات</a></li>
+                        <li><a href="#brands" class="hover:text-white transition" data-ar="الماركات" data-fr="Marques">الماركات</a></li>
+                        <li><a href="#contact" class="hover:text-white transition" data-ar="اتصل بنا" data-fr="Contact">اتصل بنا</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4" data-ar="الفئات" data-fr="Catégories">الفئات</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" onclick="filterProducts('medicines'); return false;" class="hover:text-white transition" data-ar="الأدوية" data-fr="Médicaments">الأدوية</a></li>
+                        <li><a href="#" onclick="filterProducts('skincare'); return false;" class="hover:text-white transition" data-ar="العناية بالبشرة" data-fr="Soins">العناية بالبشرة</a></li>
+                        <li><a href="#" onclick="filterProducts('vitamins'); return false;" class="hover:text-white transition" data-ar="الفيتامينات" data-fr="Vitamines">الفيتامينات</a></li>
+                        <li><a href="#" onclick="filterProducts('baby'); return false;" class="hover:text-white transition" data-ar="منتجات الأطفال" data-fr="Bébé">منتجات الأطفال</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4" data-ar="النشرة البريدية" data-fr="Newsletter">النشرة البريدية</h4>
+                    <p class="text-gray-400 text-sm mb-4" data-ar="اشترك للحصول على آخر العروض والأخبار" data-fr="Abonnez-vous pour les dernières offres">
+                        اشترك للحصول على آخر العروض والأخبار
+                    </p>
+                    <form class="flex gap-2">
+                        <input type="email" class="flex-1 bg-gray-800 border-0 rounded-lg py-2 px-4 text-sm" placeholder="email@example.com">
+                        <button type="submit" class="bg-cyan-600 px-4 py-2 rounded-lg hover:bg-cyan-700 transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-wrap items-center justify-between gap-4">
+                <p class="text-gray-400 text-sm" data-ar="© 2025 KB-Medic. جميع الحقوق محفوظة." data-fr="© 2025 KB-Medic. Tous droits réservés.">
+                    © 2025 KB-Medic. جميع الحقوق محفوظة.
+                </p>
+                <div class="flex items-center gap-4">
+                    <img src="https://img.icons8.com/color/48/visa.png" alt="Visa" class="h-8">
+                    <img src="https://img.icons8.com/color/48/mastercard.png" alt="Mastercard" class="h-8">
+                    <img src="https://img.icons8.com/color/48/cash-in-hand.png" alt="Cash" class="h-8">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-800" data-ar="تسجيل الدخول" data-fr="Connexion">تسجيل الدخول</h3>
+                <button onclick="closeModal('login-modal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form onsubmit="login(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="البريد الإلكتروني" data-fr="Email">البريد الإلكتروني</label>
+                        <input type="email" id="login-email" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4" placeholder="email@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="كلمة المرور" data-fr="Mot de passe">كلمة المرور</label>
+                        <input type="password" id="login-password" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4" data-placeholder-ar="أدخل كلمة المرور" data-placeholder-fr="Entrez le mot de passe" placeholder="أدخل كلمة المرور">
+                    </div>
+                    <button type="submit" class="w-full gradient-primary text-white py-3 rounded-xl font-bold hover:shadow-lg transition" data-ar="تسجيل الدخول" data-fr="Se connecter">
+                        تسجيل الدخول
+                    </button>
+                </div>
+            </form>
+            <p class="text-center text-sm text-gray-500 mt-6">
+                <span data-ar="ليس لديك حساب؟" data-fr="Pas de compte?">ليس لديك حساب؟</span>
+                <button onclick="closeModal('login-modal'); openModal('register-modal')" class="text-cyan-600 font-medium hover:underline" data-ar="سجل الآن" data-fr="Inscrivez-vous">سجل الآن</button>
+            </p>
+            <div class="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-500">
+                <p><strong>Admin:</strong> admin@kb-medic.com / admin123</p>
+                <p><strong>User:</strong> user@test.com / user123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-800" data-ar="إنشاء حساب" data-fr="Créer un compte">إنشاء حساب</h3>
+                <button onclick="closeModal('register-modal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form onsubmit="register(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="الاسم الكامل" data-fr="Nom complet">الاسم الكامل</label>
+                        <input type="text" id="register-name" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4" data-placeholder-ar="أدخل اسمك" data-placeholder-fr="Votre nom" placeholder="أدخل اسمك">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="البريد الإلكتروني" data-fr="Email">البريد الإلكتروني</label>
+                        <input type="email" id="register-email" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4" placeholder="email@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="رقم الهاتف" data-fr="Téléphone">رقم الهاتف</label>
+                        <input type="tel" id="register-phone" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4" placeholder="+213 5XX XXX XXX">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="كلمة المرور" data-fr="Mot de passe">كلمة المرور</label>
+                        <input type="password" id="register-password" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4" data-placeholder-ar="أدخل كلمة المرور" data-placeholder-fr="Mot de passe" placeholder="أدخل كلمة المرور">
+                    </div>
+                    <button type="submit" class="w-full gradient-primary text-white py-3 rounded-xl font-bold hover:shadow-lg transition" data-ar="إنشاء حساب" data-fr="Créer un compte">
+                        إنشاء حساب
+                    </button>
+                </div>
+            </form>
+            <p class="text-center text-sm text-gray-500 mt-6">
+                <span data-ar="لديك حساب بالفعل؟" data-fr="Déjà un compte?">لديك حساب بالفعل؟</span>
+                <button onclick="closeModal('register-modal'); openModal('login-modal')" class="text-cyan-600 font-medium hover:underline" data-ar="سجل دخول" data-fr="Connectez-vous">سجل دخول</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Product Quick View Modal -->
+    <div id="product-modal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div id="product-modal-content" class="p-8">
+                <!-- Product details will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800" data-ar="إتمام الطلب" data-fr="Finaliser la commande">إتمام الطلب</h3>
+                    <button onclick="closeModal('checkout-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form onsubmit="placeOrder(event)">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <h4 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                                <i class="fas fa-user text-cyan-600"></i>
+                                <span data-ar="معلومات التوصيل" data-fr="Informations de livraison">معلومات التوصيل</span>
+                            </h4>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="الاسم الكامل" data-fr="Nom complet">الاسم الكامل</label>
+                            <input type="text" id="checkout-name" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="رقم الهاتف" data-fr="Téléphone">رقم الهاتف</label>
+                            <input type="tel" id="checkout-phone" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="الولاية" data-fr="Wilaya">الولاية</label>
+                            <select id="checkout-wilaya" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4">
+                                <option value="">اختر الولاية</option>
+                                <option value="الجزائر">الجزائر</option>
+                                <option value="وهران">وهران</option>
+                                <option value="قسنطينة">قسنطينة</option>
+                                <option value="عنابة">عنابة</option>
+                                <option value="البليدة">البليدة</option>
+                                <option value="سطيف">سطيف</option>
+                                <option value="باتنة">باتنة</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="البلدية" data-fr="Commune">البلدية</label>
+                            <input type="text" id="checkout-commune" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-ar="العنوان بالتفصيل" data-fr="Adresse détaillée">العنوان بالتفصيل</label>
+                            <textarea id="checkout-address" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 resize-none" rows="2"></textarea>
+                        </div>
+                        
+                        <div class="md:col-span-2 border-t pt-6 mt-2">
+                            <h4 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                                <i class="fas fa-credit-card text-cyan-600"></i>
+                                <span data-ar="طريقة الدفع" data-fr="Mode de paiement">طريقة الدفع</span>
+                            </h4>
+                            <div class="flex gap-4">
+                                <label class="flex-1 flex items-center gap-3 p-4 bg-gray-50 rounded-xl cursor-pointer border-2 border-cyan-600">
+                                    <input type="radio" name="payment" value="cod" checked class="text-cyan-600">
+                                    <i class="fas fa-money-bill-wave text-green-600"></i>
+                                    <span data-ar="الدفع عند الاستلام" data-fr="Paiement à la livraison">الدفع عند الاستلام</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="md:col-span-2 border-t pt-6 mt-2">
+                            <div class="bg-gray-50 rounded-xl p-4 space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600" data-ar="المجموع الفرعي" data-fr="Sous-total">المجموع الفرعي</span>
+                                    <span id="checkout-subtotal">0 دج</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600" data-ar="التوصيل" data-fr="Livraison">التوصيل</span>
+                                    <span id="checkout-shipping">300 دج</span>
+                                </div>
+                                <div class="flex justify-between text-lg font-bold border-t pt-2">
+                                    <span data-ar="المجموع الكلي" data-fr="Total">المجموع الكلي</span>
+                                    <span id="checkout-total" class="text-cyan-600">0 دج</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <button type="submit" class="w-full gradient-primary text-white py-4 rounded-xl font-bold hover:shadow-lg transition flex items-center justify-center gap-2">
+                                <i class="fas fa-check-circle"></i>
+                                <span data-ar="تأكيد الطلب" data-fr="Confirmer la commande">تأكيد الطلب</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default Products Data (fallback when API is unavailable)
+        function getDefaultProducts() {
+            return [
+                { id: 1, name: { ar: 'دوليبران 500mg', fr: 'Doliprane 500mg' }, price: 250, oldPrice: 320, category: 'medicines', brand: 'Sanofi', image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300', rating: 4.5, stock: 50 },
+                { id: 2, name: { ar: 'فيتامين C 1000mg', fr: 'Vitamine C 1000mg' }, price: 850, oldPrice: null, category: 'vitamins', brand: 'Vitaforce', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300', rating: 5, stock: 30 },
+                { id: 3, name: { ar: 'كريم مرطب Bioderma', fr: 'Crème Bioderma' }, price: 2500, oldPrice: 3000, category: 'skincare', brand: 'Bioderma', image: 'https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?w=300', rating: 4.8, stock: 15 },
+                { id: 4, name: { ar: 'حليب الأطفال Gallia', fr: 'Lait Gallia' }, price: 1800, oldPrice: null, category: 'baby', brand: 'Gallia', image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=300', rating: 4.7, stock: 25 },
+                { id: 5, name: { ar: 'جهاز قياس الضغط', fr: 'Tensiomètre' }, price: 4500, oldPrice: 5500, category: 'equipment', brand: 'Omron', image: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=300', rating: 4.9, stock: 10 },
+                { id: 6, name: { ar: 'واقي شمس SPF50', fr: 'Écran solaire SPF50' }, price: 1950, oldPrice: null, category: 'skincare', brand: 'La Roche-Posay', image: 'https://images.unsplash.com/photo-1556227834-09f1de7a7d14?w=300', rating: 4.6, stock: 40 },
+                { id: 7, name: { ar: 'أوميغا 3', fr: 'Oméga 3' }, price: 1200, oldPrice: 1500, category: 'vitamins', brand: 'Nordic', image: 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=300', rating: 4.4, stock: 35 },
+                { id: 8, name: { ar: 'حفاضات Pampers', fr: 'Couches Pampers' }, price: 950, oldPrice: null, category: 'baby', brand: 'Pampers', image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300', rating: 4.8, stock: 100 },
+                { id: 9, name: { ar: 'معقم اليدين', fr: 'Gel désinfectant' }, price: 350, oldPrice: 450, category: 'hygiene', brand: 'Purell', image: 'https://images.unsplash.com/photo-1584744982491-665216d95f8b?w=300', rating: 4.3, stock: 200 },
+                { id: 10, name: { ar: 'ترمومتر رقمي', fr: 'Thermomètre digital' }, price: 800, oldPrice: null, category: 'equipment', brand: 'Braun', image: 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=300', rating: 4.7, stock: 45 },
+                { id: 11, name: { ar: 'سيروم فيتامين C', fr: 'Sérum Vitamine C' }, price: 3200, oldPrice: 3800, category: 'skincare', brand: 'Vichy', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=300', rating: 4.9, stock: 20 },
+                { id: 12, name: { ar: 'باراسيتامول 1g', fr: 'Paracétamol 1g' }, price: 180, oldPrice: null, category: 'medicines', brand: 'Biopharm', image: 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=300', rating: 4.2, stock: 150 }
+            ];
+        }
+
+        // Get products from API with fallback to localStorage
+        async function getProducts() {
+            try {
+                const data = await API.products.getProducts();
+                if (data && data.length > 0) {
+                    return data;
+                }
+            } catch (e) {
+                console.log('API unavailable, using local data');
+            }
+            
+            // Fallback to localStorage or default products
+            let products = JSON.parse(localStorage.getItem('kb_medic_products'));
+            if (!products) {
+                products = getDefaultProducts();
+                localStorage.setItem('kb_medic_products', JSON.stringify(products));
+            }
+            return products;
+        }
+
+        // Save products to LocalStorage
+        function saveProducts(products) {
+            localStorage.setItem('kb_medic_products', JSON.stringify(products));
+        }
+
+        // Initialize global variables
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        let currentLang = localStorage.getItem('lang') || 'ar';
+        let currentFilter = 'all';
+
+        // Users database
+        let users = JSON.parse(localStorage.getItem('users')) || [
+            { id: 1, name: 'Admin', email: 'admin@kb-medic.com', password: 'admin123', phone: '+213555123456', role: 'admin', loyaltyPoints: 0 },
+            { id: 2, name: 'مستخدم تجريبي', email: 'user@test.com', password: 'user123', phone: '+213666789012', role: 'user', loyaltyPoints: 150 }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await renderProducts();
+            updateCartUI();
+            updateWishlistUI();
+            updateUserUI();
+            applyLanguage();
+            loadSettingsFromAdmin(); // Load settings from admin panel
+            
+            // Search functionality
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                renderProducts(query);
+            });
+        });
+
+        // Language Toggle
+        function toggleLanguage() {
+            // Close all sidebars before switching language to prevent rendering issues
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const overlay = document.getElementById('overlay');
+            
+            if (cartSidebar && cartSidebar.classList.contains('active')) {
+                cartSidebar.classList.remove('active');
+            }
+            
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+            }
+            
+            if (overlay && !overlay.classList.contains('hidden')) {
+                overlay.classList.add('hidden');
+            }
+            
+            currentLang = currentLang === 'ar' ? 'fr' : 'ar';
+            localStorage.setItem('lang', currentLang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const html = document.documentElement;
+            html.lang = currentLang;
+            html.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            
+            document.getElementById('lang-toggle-text').textContent = currentLang === 'ar' ? 'FR' : 'AR';
+            
+            // Update all text elements
+            document.querySelectorAll('[data-ar]').forEach(el => {
+                el.textContent = el.getAttribute(`data-${currentLang}`);
+            });
+            
+            // Update placeholders
+            document.querySelectorAll('[data-placeholder-ar]').forEach(el => {
+                el.placeholder = el.getAttribute(`data-placeholder-${currentLang}`);
+            });
+            
+            renderProducts();
+            updateCartUI();
+        }
+
+        // Load settings from admin panel
+        function loadSettingsFromAdmin() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('settings'));
+                if (settings) {
+                    // Update store name
+                    const storeNameEl = document.getElementById('store-name');
+                    if (storeNameEl && settings.storeName) {
+                        storeNameEl.textContent = settings.storeName;
+                    }
+                    // Update page title
+                    document.title = settings.storeName ? `${settings.storeName} | صيدليتك الإلكترونية` : 'KB-Medic | صيدليتك الإلكترونية';
+                    // Update footer copyright
+                    const footerCopyright = document.getElementById('footer-copyright');
+                    if (footerCopyright && settings.storeName) {
+                        footerCopyright.textContent = `© 2025 ${settings.storeName}. جميع الحقوق محفوظة.`;
+                    }
+                    // Update delivery fee
+                    if (settings.deliveryFee !== undefined) {
+                        window.deliveryFee = settings.deliveryFee;
+                        const shippingEl = document.getElementById('checkout-shipping');
+                        if (shippingEl) {
+                            shippingEl.textContent = `${settings.deliveryFee} دج`;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('Using default settings');
+            }
+        }
+
+        // Products
+        async function renderProducts(searchQuery = '') {
+            const grid = document.getElementById('products-grid');
+            
+            // Show loading state
+            grid.innerHTML = `<div class="col-span-full text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-cyan-600"></i><p class="mt-4 text-gray-500">جاري تحميل المنتجات...</p></div>`;
+            
+            try {
+                const products = await getProducts();
+                let filtered = products;
+            
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(p => p.category === currentFilter);
+            }
+            
+                if (searchQuery) {
+                    filtered = filtered.filter(p => 
+                        p.name?.ar?.toLowerCase().includes(searchQuery) ||
+                        p.name?.fr?.toLowerCase().includes(searchQuery) ||
+                        p.brand?.toLowerCase().includes(searchQuery)
+                    );
+                }
+                
+                grid.innerHTML = filtered.map(p => `
+                <div class="product-card bg-white rounded-2xl shadow-sm overflow-hidden group hover:shadow-xl transition">
+                    <div class="relative overflow-hidden">
+                        <img src="${p.image}" alt="${p.name[currentLang]}" class="product-image w-full h-48 object-cover transition duration-500">
+                        ${p.oldPrice ? `<span class="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full">${Math.round((1 - p.price/p.oldPrice) * 100)}%-</span>` : ''}
+                        <div class="quick-actions absolute bottom-3 left-3 right-3 flex justify-center gap-2">
+                            <button onclick="openProductModal(${p.id})" class="bg-white text-cyan-600 p-2 rounded-full shadow-lg hover:bg-cyan-600 hover:text-white transition" title="عرض سريع">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="toggleWishlist(${p.id})" class="bg-white ${wishlist.includes(p.id) ? 'text-red-500' : 'text-gray-400'} p-2 rounded-full shadow-lg hover:text-red-500 transition" title="المفضلة">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-xs text-cyan-600 font-medium mb-1">${p.brand}</p>
+                        <h3 class="font-bold text-gray-800 mb-2 truncate">${p.name[currentLang]}</h3>
+                        <div class="flex items-center gap-1 mb-2">
+                            ${Array(5).fill().map((_, i) => `<i class="fas fa-star text-xs ${i < Math.floor(p.rating) ? 'text-yellow-400' : 'text-gray-300'}"></i>`).join('')}
+                            <span class="text-xs text-gray-500">(${p.rating})</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-lg font-bold text-cyan-600">${p.price} ${currentLang === 'ar' ? 'دج' : 'DA'}</span>
+                                ${p.oldPrice ? `<span class="text-sm text-gray-400 line-through mr-2">${p.oldPrice}</span>` : ''}
+                            </div>
+                            <button onclick="addToCart(${p.id})" class="bg-cyan-100 text-cyan-600 p-2 rounded-lg hover:bg-cyan-600 hover:text-white transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            } catch (error) {
+                console.error('Error rendering products:', error);
+                grid.innerHTML = `<div class="col-span-full text-center py-12"><i class="fas fa-exclamation-triangle text-4xl text-yellow-500"></i><p class="mt-4 text-gray-500">حدث خطأ في تحميل المنتجات</p><button onclick="renderProducts()" class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg">إعادة المحاولة</button></div>`;
+            }
+        }
+
+        function filterProducts(category) {
+            currentFilter = category;
+            
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-cyan-600', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            
+            // Find the button that was clicked
+            event.target.classList.add('active', 'bg-cyan-600', 'text-white');
+            event.target.classList.remove('bg-gray-100', 'text-gray-700');
+            
+            renderProducts();
+            
+            // Scroll to products
+            const productsSection = document.getElementById('products');
+            if (productsSection) {
+                productsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function sortProducts() {
+            const sortValue = document.getElementById('sort-select').value;
+            const products = getProducts();
+            
+            let sorted = [...products];
+            
+            if (currentFilter !== 'all') {
+                sorted = sorted.filter(p => p.category === currentFilter);
+            }
+            
+            if (sortValue === 'price-low') {
+                sorted.sort((a, b) => a.price - b.price);
+            } else if (sortValue === 'price-high') {
+                sorted.sort((a, b) => b.price - a.price);
+            } else if (sortValue === 'name') {
+                sorted.sort((a, b) => a.name[currentLang].localeCompare(b.name[currentLang]));
+            }
+            
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = sorted.map(p => `
+                <div class="product-card bg-white rounded-2xl shadow-sm overflow-hidden group hover:shadow-xl transition">
+                    <div class="relative overflow-hidden">
+                        <img src="${p.image}" alt="${p.name[currentLang]}" class="product-image w-full h-48 object-cover transition duration-500">
+                        ${p.oldPrice ? `<span class="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full">${Math.round((1 - p.price/p.oldPrice) * 100)}%-</span>` : ''}
+                        <div class="quick-actions absolute bottom-3 left-3 right-3 flex justify-center gap-2">
+                            <button onclick="openProductModal(${p.id})" class="bg-white text-cyan-600 p-2 rounded-full shadow-lg hover:bg-cyan-600 hover:text-white transition" title="عرض سريع">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="toggleWishlist(${p.id})" class="bg-white ${wishlist.includes(p.id) ? 'text-red-500' : 'text-gray-400'} p-2 rounded-full shadow-lg hover:text-red-500 transition" title="المفضلة">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-xs text-cyan-600 font-medium mb-1">${p.brand}</p>
+                        <h3 class="font-bold text-gray-800 mb-2 truncate">${p.name[currentLang]}</h3>
+                        <div class="flex items-center gap-1 mb-2">
+                            ${Array(5).fill().map((_, i) => `<i class="fas fa-star text-xs ${i < Math.floor(p.rating) ? 'text-yellow-400' : 'text-gray-300'}"></i>`).join('')}
+                            <span class="text-xs text-gray-500">(${p.rating})</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-lg font-bold text-cyan-600">${p.price} ${currentLang === 'ar' ? 'دج' : 'DA'}</span>
+                                ${p.oldPrice ? `<span class="text-sm text-gray-400 line-through mr-2">${p.oldPrice}</span>` : ''}
+                            </div>
+                            <button onclick="addToCart(${p.id})" class="bg-cyan-100 text-cyan-600 p-2 rounded-lg hover:bg-cyan-600 hover:text-white transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function openProductModal(id) {
+            const products = await getProducts();
+            const product = products.find(p => p.id === id);
+            const modal = document.getElementById('product-modal');
+            const content = document.getElementById('product-modal-content');
+            
+            content.innerHTML = `
+                <div class="flex items-start justify-between mb-4">
+                    <div></div>
+                    <button onclick="closeModal('product-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <img src="${product.image}" alt="${product.name[currentLang]}" class="w-full h-80 object-cover rounded-2xl">
+                    </div>
+                    <div>
+                        <span class="text-cyan-600 font-medium">${product.brand}</span>
+                        <h2 class="text-2xl font-bold text-gray-800 mt-1 mb-4">${product.name[currentLang]}</h2>
+                        <div class="flex items-center gap-2 mb-4">
+                            ${Array(5).fill().map((_, i) => `<i class="fas fa-star ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'}"></i>`).join('')}
+                            <span class="text-gray-500">(${product.rating})</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <span class="text-3xl font-bold text-cyan-600">${product.price} ${currentLang === 'ar' ? 'دج' : 'DA'}</span>
+                            ${product.oldPrice ? `<span class="text-xl text-gray-400 line-through">${product.oldPrice} ${currentLang === 'ar' ? 'دج' : 'DA'}</span>` : ''}
+                        </div>
+                        <p class="text-gray-500 mb-6">${currentLang === 'ar' ? 'منتج أصلي 100% مع ضمان الجودة. متوفر في المخزون.' : 'Produit 100% original avec garantie qualité. En stock.'}</p>
+                        <div class="flex items-center gap-4 mb-6">
+                            <span class="text-sm text-gray-600">${currentLang === 'ar' ? 'الكمية:' : 'Quantité:'}</span>
+                            <div class="flex items-center border rounded-lg">
+                                <button onclick="decreaseModalQty()" class="px-3 py-2 hover:bg-gray-100"><i class="fas fa-minus"></i></button>
+                                <input type="number" id="modal-qty" value="1" min="1" class="w-16 text-center border-x py-2">
+                                <button onclick="increaseModalQty()" class="px-3 py-2 hover:bg-gray-100"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="addToCartFromModal(${product.id})" class="flex-1 gradient-primary text-white py-3 rounded-xl font-bold hover:shadow-lg transition flex items-center justify-center gap-2">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>${currentLang === 'ar' ? 'إضافة للسلة' : 'Ajouter au panier'}</span>
+                            </button>
+                            <button onclick="toggleWishlist(${product.id})" class="p-3 border rounded-xl ${wishlist.includes(product.id) ? 'text-red-500 border-red-500' : 'text-gray-400'} hover:text-red-500 transition">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            openModal('product-modal');
+        }
+
+        function increaseModalQty() {
+            const input = document.getElementById('modal-qty');
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseModalQty() {
+            const input = document.getElementById('modal-qty');
+            if (parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;
+        }
+
+        function addToCartFromModal(id) {
+            const qty = parseInt(document.getElementById('modal-qty').value);
+            for (let i = 0; i < qty; i++) addToCart(id);
+            closeModal('product-modal');
+        }
+
+        // Cart
+        function addToCart(id) {
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ id, qty: 1 });
+            }
+            saveCart();
+            showToast(currentLang === 'ar' ? 'تمت الإضافة إلى السلة' : 'Ajouté au panier', 'success');
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            saveCart();
+        }
+
+        function updateCartQty(id, change) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.qty += change;
+                if (item.qty <= 0) removeFromCart(id);
+                else saveCart();
+            }
+        }
+
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+
+        async function updateCartUI() {
+            const count = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cart-count').textContent = count;
+            
+            const cartItems = document.getElementById('cart-items');
+            const cartEmpty = document.getElementById('cart-empty');
+            const cartFooter = document.getElementById('cart-footer');
+            
+            // Await products since getProducts is async
+            const products = await getProducts();
+            
+            if (cart.length === 0) {
+                cartItems.classList.add('hidden');
+                cartEmpty.classList.remove('hidden');
+                cartFooter.classList.add('hidden');
+            } else {
+                cartItems.classList.remove('hidden');
+                cartEmpty.classList.add('hidden');
+                cartFooter.classList.remove('hidden');
+                
+                let total = 0;
+                cartItems.innerHTML = cart.map(item => {
+                    const product = products.find(p => p.id === item.id);
+                    if (!product) return '';
+                    const itemTotal = product.price * item.qty;
+                    total += itemTotal;
+                    return `
+                        <div class="flex gap-4 bg-gray-50 p-3 rounded-xl">
+                            <img src="${product.image}" alt="${product.name[currentLang]}" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-800 text-sm">${product.name[currentLang]}</h4>
+                                <p class="text-cyan-600 font-bold">${product.price} ${currentLang === 'ar' ? 'دج' : 'DA'}</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300">
+                                        <i class="fas fa-minus text-xs"></i>
+                                    </button>
+                                    <span class="text-sm font-medium">${item.qty}</span>
+                                    <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300">
+                                        <i class="fas fa-plus text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+                
+                const deliveryFee = window.deliveryFee || 300;
+                document.getElementById('cart-total').textContent = `${total} ${currentLang === 'ar' ? 'دج' : 'DA'}`;
+                document.getElementById('checkout-subtotal').textContent = `${total} ${currentLang === 'ar' ? 'دج' : 'DA'}`;
+                document.getElementById('checkout-total').textContent = `${total + deliveryFee} ${currentLang === 'ar' ? 'دج' : 'DA'}`;
+            }
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Wishlist
+        async function toggleWishlist(id) {
+            const index = wishlist.indexOf(id);
+            const products = await getProducts();
+            const product = products.find(p => p.id === id);
+            
+            if (index > -1) {
+                wishlist.splice(index, 1);
+                showToast(currentLang === 'ar' ? 'تمت الإزالة من المفضلة' : 'Retiré des favoris', 'info');
+            } else {
+                wishlist.push(id);
+                showToast(currentLang === 'ar' ? 'تمت الإضافة إلى المفضلة' : 'Ajouté aux favoris', 'success');
+            }
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            updateWishlistUI();
+            renderProducts();
+        }
+
+        async function updateWishlistUI() {
+            const count = wishlist.length;
+            const countEl = document.getElementById('wishlist-count');
+            if (count > 0) {
+                countEl.textContent = count;
+                countEl.classList.remove('hidden');
+            } else {
+                countEl.classList.add('hidden');
+            }
+            
+            document.getElementById('wishlist-total').textContent = count;
+            
+            // Update wishlist grid in dashboard
+            const grid = document.getElementById('wishlist-grid');
+            const noWishlist = document.getElementById('no-wishlist');
+            const products = await getProducts();
+            
+            if (wishlist.length === 0) {
+                grid.classList.add('hidden');
+                noWishlist.classList.remove('hidden');
+            } else {
+                grid.classList.remove('hidden');
+                noWishlist.classList.add('hidden');
+                grid.innerHTML = wishlist.map(id => {
+                    const p = products.find(pr => pr.id === id);
+                    return `
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                            <img src="${p.image}" alt="${p.name[currentLang]}" class="w-full h-32 object-cover">
+                            <div class="p-4">
+                                <h4 class="font-medium text-gray-800 text-sm truncate">${p.name[currentLang]}</h4>
+                                <p class="text-cyan-600 font-bold">${p.price} ${currentLang === 'ar' ? 'دج' : 'DA'}</p>
+                                <div class="flex gap-2 mt-3">
+                                    <button onclick="addToCart(${p.id})" class="flex-1 bg-cyan-100 text-cyan-600 py-2 rounded-lg text-sm hover:bg-cyan-600 hover:text-white transition">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                    <button onclick="toggleWishlist(${p.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // User Auth
+        function login(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                closeModal('login-modal');
+                updateUserUI();
+                showToast(currentLang === 'ar' ? 'مرحباً بك!' : 'Bienvenue!', 'success');
+            } else {
+                showToast(currentLang === 'ar' ? 'بيانات خاطئة' : 'Données incorrectes', 'error');
+            }
+        }
+
+        function register(e) {
+            e.preventDefault();
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const phone = document.getElementById('register-phone').value;
+            const password = document.getElementById('register-password').value;
+            
+            if (users.find(u => u.email === email)) {
+                showToast(currentLang === 'ar' ? 'البريد مستخدم بالفعل' : 'Email déjà utilisé', 'error');
+                return;
+            }
+            
+            const newUser = {
+                id: users.length + 1,
+                name,
+                email,
+                phone,
+                password,
+                role: 'user',
+                loyaltyPoints: 50 // Welcome bonus
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            currentUser = newUser;
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+            
+            closeModal('register-modal');
+            updateUserUI();
+            showToast(currentLang === 'ar' ? 'تم إنشاء حسابك! +50 نقطة ترحيبية' : 'Compte créé! +50 points de bienvenue', 'success');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUserUI();
+            showSection('home');
+            showToast(currentLang === 'ar' ? 'تم تسجيل الخروج' : 'Déconnecté', 'info');
+        }
+
+        function updateUserUI() {
+            const loggedOutMenu = document.getElementById('logged-out-menu');
+            const loggedInMenu = document.getElementById('logged-in-menu');
+            const userName = document.getElementById('user-name');
+            
+            if (currentUser) {
+                loggedOutMenu.classList.add('hidden');
+                loggedInMenu.classList.remove('hidden');
+                userName.textContent = currentUser.name;
+                
+                document.getElementById('loyalty-points').textContent = currentUser.loyaltyPoints;
+                document.getElementById('loyalty-points-display').textContent = currentUser.loyaltyPoints;
+                
+                // Profile form
+                document.getElementById('profile-name').value = currentUser.name;
+                document.getElementById('profile-email').value = currentUser.email;
+                document.getElementById('profile-phone').value = currentUser.phone || '';
+                document.getElementById('profile-address').value = currentUser.address || '';
+            } else {
+                loggedOutMenu.classList.remove('hidden');
+                loggedInMenu.classList.add('hidden');
+                userName.textContent = currentLang === 'ar' ? 'حسابي' : 'Mon compte';
+            }
+            
+            // Update orders
+            const userOrders = orders.filter(o => o.userId === currentUser?.id);
+            document.getElementById('total-orders').textContent = userOrders.length;
+            document.getElementById('delivered-orders').textContent = userOrders.filter(o => o.status === 'delivered').length;
+            
+            renderOrders();
+        }
+
+        function toggleUserMenu() {
+            document.getElementById('user-dropdown').classList.toggle('hidden');
+        }
+
+        // Orders
+        async function placeOrder(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                closeModal('checkout-modal');
+                openModal('login-modal');
+                showToast(currentLang === 'ar' ? 'يرجى تسجيل الدخول أولاً' : 'Veuillez vous connecter', 'info');
+                return;
+            }
+            
+            const products = await getProducts();
+            const orderId = 'ORD-' + Date.now().toString().slice(-6);
+            const deliveryFee = window.deliveryFee || 300;
+            const order = {
+                id: orderId,
+                userId: currentUser.id,
+                items: cart.map(item => ({
+                    ...item,
+                    product: products.find(p => p.id === item.id)
+                })),
+                total: cart.reduce((sum, item) => sum + products.find(p => p.id === item.id).price * item.qty, 0) + deliveryFee,
+                status: 'pending',
+                date: new Date().toISOString(),
+                shipping: {
+                    name: document.getElementById('checkout-name').value,
+                    phone: document.getElementById('checkout-phone').value,
+                    wilaya: document.getElementById('checkout-wilaya').value,
+                    commune: document.getElementById('checkout-commune').value,
+                    address: document.getElementById('checkout-address').value
+                }
+            };
+            
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            // Add loyalty points
+            const points = Math.floor(order.total / 100);
+            currentUser.loyaltyPoints += points;
+            
+            // Update user profile with shipping info for future orders
+            if (currentUser) {
+                currentUser.name = document.getElementById('checkout-name').value;
+                currentUser.phone = document.getElementById('checkout-phone').value;
+                currentUser.wilaya = document.getElementById('checkout-wilaya').value;
+                currentUser.commune = document.getElementById('checkout-commune').value;
+                currentUser.address = document.getElementById('checkout-address').value;
+            }
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            if (userIndex > -1) {
+                users[userIndex] = currentUser;
+            }
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // Clear cart
+            cart = [];
+            saveCart();
+            
+            closeModal('checkout-modal');
+            toggleCart();
+            updateUserUI();
+            
+            showToast(currentLang === 'ar' ? `تم تأكيد طلبك! +${points} نقطة` : `Commande confirmée! +${points} points`, 'success');
+        }
+
+        function renderOrders() {
+            const ordersList = document.getElementById('orders-list');
+            const noOrders = document.getElementById('no-orders');
+            const products = getProducts();
+            
+            const userOrders = orders.filter(o => o.userId === currentUser?.id).reverse();
+            
+            if (userOrders.length === 0) {
+                ordersList.classList.add('hidden');
+                noOrders.classList.remove('hidden');
+            } else {
+                ordersList.classList.remove('hidden');
+                noOrders.classList.add('hidden');
+                
+                const statusLabels = {
+                    pending: { ar: 'قيد الانتظار', fr: 'En attente', color: 'yellow' },
+                    processing: { ar: 'قيد التحضير', fr: 'En préparation', color: 'blue' },
+                    shipping: { ar: 'في الطريق', fr: 'En livraison', color: 'purple' },
+                    delivered: { ar: 'تم التوصيل', fr: 'Livré', color: 'green' }
+                };
+                
+                ordersList.innerHTML = userOrders.map(order => {
+                    const status = statusLabels[order.status];
+                    return `
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <span class="text-sm text-gray-500">${currentLang === 'ar' ? 'طلب رقم' : 'Commande N°'} #${order.id}</span>
+                                    <p class="text-sm text-gray-400">${new Date(order.date).toLocaleDateString('ar-DZ')}</p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-sm bg-${status.color}-100 text-${status.color}-700">${status[currentLang]}</span>
+                            </div>
+                            <div class="flex gap-4 overflow-x-auto pb-2">
+                                ${order.items.map(item => `
+                                    <div class="flex-shrink-0 w-20">
+                                        <img src="${item.product.image}" alt="" class="w-20 h-20 object-cover rounded-lg">
+                                        <p class="text-xs text-gray-500 mt-1 truncate">${item.product.name[currentLang]}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="flex justify-between items-center mt-4 pt-4 border-t">
+                                <span class="text-gray-600">${currentLang === 'ar' ? 'المجموع:' : 'Total:'}</span>
+                                <span class="font-bold text-cyan-600">${order.total} ${currentLang === 'ar' ? 'دج' : 'DA'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Sections
+        function showSection(section) {
+            const mainContent = document.getElementById('main-content');
+            const dashboard = document.getElementById('dashboard-section');
+            
+            if (section === 'home') {
+                mainContent.classList.remove('hidden');
+                dashboard.classList.add('hidden');
+            } else {
+                if (!currentUser) {
+                    openModal('login-modal');
+                    return;
+                }
+                mainContent.classList.add('hidden');
+                dashboard.classList.remove('hidden');
+                
+                if (section === 'orders') showDashboardTab('my-orders', null);
+                else if (section === 'wishlist') showDashboardTab('my-wishlist', null);
+                else if (section === 'loyalty') showDashboardTab('my-loyalty', null);
+                else showDashboardTab('overview', null);
+            }
+            
+            closeAll();
+        }
+
+        function showDashboardTab(tab, evt) {
+            document.querySelectorAll('.dash-tab').forEach(btn => {
+                btn.classList.remove('bg-cyan-600', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            
+            if (evt && evt.target) {
+                evt.target.classList.add('bg-cyan-600', 'text-white');
+                evt.target.classList.remove('bg-gray-100', 'text-gray-700');
+            } else {
+                // Fallback: find the button for this tab
+                const buttons = document.querySelectorAll('.dash-tab');
+                const tabMapping = {
+                    'overview': 0,
+                    'my-orders': 1,
+                    'my-wishlist': 2,
+                    'my-loyalty': 3,
+                    'my-profile': 4
+                };
+                if (buttons[tabMapping[tab]]) {
+                    buttons[tabMapping[tab]].classList.add('bg-cyan-600', 'text-white');
+                    buttons[tabMapping[tab]].classList.remove('bg-gray-100', 'text-gray-700');
+                }
+            }
+            
+            document.querySelectorAll('.dash-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(`dash-${tab}`)?.classList.remove('hidden');
+            updateWishlistUI();
+        }
+
+        // Order functions - create order via API
+        async function placeOrderViaAPI(orderData) {
+            try {
+                const result = await API.orders.createOrder(orderData.items, orderData.customerInfo);
+                return result;
+            } catch (error) {
+                console.error('API order error:', error);
+                throw error;
+            }
+        }
+
+        // Modals
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.getElementById('overlay').classList.remove('hidden');
+        }
+
+        // Checkout Modal - pre-fill user data if logged in
+        function openCheckoutModal() {
+            // Open modal
+            document.getElementById('checkout-modal').classList.add('active');
+            document.getElementById('overlay').classList.remove('hidden');
+            
+            // If user is logged in, pre-fill their data
+            if (currentUser) {
+                // Pre-fill name
+                const nameInput = document.getElementById('checkout-name');
+                if (nameInput && !nameInput.value) {
+                    nameInput.value = currentUser.name || '';
+                }
+                
+                // Pre-fill phone
+                const phoneInput = document.getElementById('checkout-phone');
+                if (phoneInput && !phoneInput.value) {
+                    phoneInput.value = currentUser.phone || '';
+                }
+                
+                // Pre-fill wilaya
+                const wilayaSelect = document.getElementById('checkout-wilaya');
+                if (wilayaSelect && !wilayaSelect.value && currentUser.wilaya) {
+                    wilayaSelect.value = currentUser.wilaya;
+                }
+                
+                // Pre-fill commune
+                const communeInput = document.getElementById('checkout-commune');
+                if (communeInput && !communeInput.value && currentUser.commune) {
+                    communeInput.value = currentUser.commune;
+                }
+                
+                // Pre-fill address
+                const addressInput = document.getElementById('checkout-address');
+                if (addressInput && !addressInput.value && currentUser.address) {
+                    addressInput.value = currentUser.address;
+                }
+                
+                // Save user info for future orders
+                saveUserInfo();
+            }
+        }
+        
+        // Save user shipping info to their profile
+        function saveUserInfo() {
+            if (!currentUser) return;
+            
+            const updatedUser = { ...currentUser };
+            updatedUser.name = document.getElementById('checkout-name').value || currentUser.name;
+            updatedUser.phone = document.getElementById('checkout-phone').value || currentUser.phone;
+            updatedUser.wilaya = document.getElementById('checkout-wilaya').value || currentUser.wilaya;
+            updatedUser.commune = document.getElementById('checkout-commune').value || currentUser.commune;
+            updatedUser.address = document.getElementById('checkout-address').value || currentUser.address;
+            
+            // Update current user
+            currentUser = updatedUser;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Update in users array
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            if (userIndex > -1) {
+                users[userIndex] = currentUser;
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            if (!document.querySelector('.modal.active')) {
+                document.getElementById('overlay').classList.add('hidden');
+            }
+        }
+
+        // Mobile Menu
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('hidden');
+        }
+
+        // Close All
+        function closeAll() {
+            document.getElementById('cart-sidebar').classList.remove('active');
+            document.getElementById('mobile-menu').classList.remove('active');
+            document.getElementById('overlay').classList.add('hidden');
+            document.getElementById('user-dropdown').classList.add('hidden');
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+        }
+
+        // Contact Form
+        function submitContact(e) {
+            e.preventDefault();
+            
+            // Save message to localStorage
+            const form = e.target;
+            const inputs = form.querySelectorAll('input, textarea');
+            const messageData = {
+                id: Date.now(),
+                name: inputs[0].value,
+                email: inputs[1].value,
+                phone: inputs[2].value,
+                message: inputs[3].value,
+                date: new Date().toISOString(),
+                read: false
+            };
+            
+            const messages = JSON.parse(localStorage.getItem('messages')) || [];
+            messages.push(messageData);
+            localStorage.setItem('messages', JSON.stringify(messages));
+            
+            showToast(currentLang === 'ar' ? 'تم إرسال رسالتك بنجاح!' : 'Message envoyé avec succès!', 'success');
+            e.target.reset();
+        }
+
+        // Toast Notifications
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${colors[type]} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Close dropdowns on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#user-dropdown') && !e.target.closest('[onclick="toggleUserMenu()"]')) {
+                document.getElementById('user-dropdown').classList.add('hidden');
+            }
+        });
+
+        // Profile form handler
+        document.getElementById('profile-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (currentUser) {
+                currentUser.name = document.getElementById('profile-name').value;
+                currentUser.email = document.getElementById('profile-email').value;
+                currentUser.phone = document.getElementById('profile-phone').value;
+                currentUser.address = document.getElementById('profile-address').value;
+                
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                const userIndex = users.findIndex(u => u.id === currentUser.id);
+                if (userIndex > -1) {
+                    users[userIndex] = currentUser;
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+                
+                showToast(currentLang === 'ar' ? 'تم حفظ التغييرات' : 'Modifications enregistrées', 'success');
+            }
+        });
+    </script>
+</body>
+</html>

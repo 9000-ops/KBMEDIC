@@ -1,0 +1,30 @@
+{
+  "name": "pharmacy-store",
+  "version": "1.0.0",
+  "description": "Pharmacy Store E-commerce with PostgreSQL",
+  "main": "vercel-server.js",
+  "scripts": {
+    "dev": "node vercel-server.js",
+    "start": "NODE_ENV=production node vercel-server.js",
+    "build": "echo 'No build step required'",
+    "migrate": "node migrate.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "next": "^14.0.0",
+    "pg": "^8.16.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
