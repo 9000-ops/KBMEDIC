@@ -1,6 +1,7 @@
 {
   "name": "pharmacy-store",
   "version": "1.0.0",
+  "private": true,
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js"
@@ -14,6 +15,6 @@
     "pg": "^8.16.3"
   },
   "engines": {
-    "node": "24.x"
+    "node": "20.x"
   }
 }
