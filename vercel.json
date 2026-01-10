@@ -7,7 +7,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/api-handler.js" 
+      "destination": "/api/api-handler.js"
     },
     {
       "source": "/(.*)\\.(html|css|js|png|jpg|jpeg|svg)",
