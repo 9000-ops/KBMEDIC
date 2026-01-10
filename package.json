@@ -1,6 +1,7 @@
 {
   "name": "pharmacy-store",
   "version": "1.0.0",
+  "private": true,
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js"
