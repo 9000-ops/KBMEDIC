@@ -3,36 +3,67 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { Pool } = require('pg'); // استدعاء المكتبة هنا أفضل
 
 const app = express();
-app.use(cors());
+
+// إعدادات CORS مهمة جداً للتواصل مع الواجهة الأمامية
+app.use(cors({
+  origin: '*', // يمكن تغييرها لرابط موقعك للأمان
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Database configuration
 const DATABASE_URL = process.env.DATABASE_URL;
 const JWT_SECRET = process.env.JWT_SECRET || 'pharmacy-store-secret-key-2024-secure';
 
-// PostgreSQL client for serverless
+// PostgreSQL client for serverless (Global Variable)
 let pgPool = null;
 
+// دالة الاتصال المحسنة
 async function getPool() {
   if (pgPool) return pgPool;
-  
-  const { Pool } = require('pg');
+
+  if (!DATABASE_URL) {
+    throw new Error("DATABASE_URL environment variable is missing!");
+  }
+
   pgPool = new Pool({
     connectionString: DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-    max: 1,
+    ssl: {
+      rejectUnauthorized: false // ضروري لـ Neon
+    },
+    max: 1, // تقليل الاتصالات في بيئة Serverless
     idleTimeoutMillis: 5000,
     connectionTimeoutMillis: 5000
   });
+
+  // اختبار الاتصال (يظهر في Logs في Vercel)
+  try {
+    const client = await pgPool.connect();
+    console.log("✅ Database connected successfully to Neon");
+    client.release();
+  } catch (err) {
+    console.error("❌ Database connection failed:", err.message);
+    pgPool = null; // إعادة تعيين الـ Pool للمحاولة مرة أخرى
+    throw err;
+  }
   
   return pgPool;
 }
 
+// دالة تنفيذ الاستعلامات
 async function query(text, params) {
-  const pool = await getPool();
-  return pool.query(text, params);
+  try {
+    const pool = await getPool();
+    return await pool.query(text, params);
+  } catch (error) {
+    console.error('Query Error:', error.message);
+    throw error;
+  }
 }
 
 // Auth middleware
@@ -51,9 +82,14 @@ function authenticate(req) {
 }
 
 // ==================== HEALTH CHECK ====================
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/api/health', async (req, res) => {
+  try {
+    // نجرب اتصال بسيط للتأكد من قاعدة البيانات
+    await query('SELECT 1');
+    res.json({ status: 'ok', database: 'connected', timestamp: new Date().toISOString() });
+  } catch (error) {
+    res.status(500).json({ status: 'error', database: 'disconnected', error: error.message });
+  }
 });
 
 // ==================== AUTH ROUTES ====================
@@ -62,36 +98,40 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
+    if (!email || !password) {
+      return res.status(400).json({ error: 'البريد الإلكتروني وكلمة المرور مطلوبان' });
+    }
+
     const result = await query(
       'SELECT id, name, email, password, role FROM users WHERE email = $1',
       [email.toLowerCase()]
     );
 
     if (result.rows.length === 0) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' });
     }
 
     const user = result.rows[0];
     const isValid = await bcrypt.compare(password, user.password);
     
     if (!isValid) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' });
     }
 
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
 
     res.json({
-      message: 'Login successful',
+      message: 'تم تسجيل الدخول بنجاح',
       token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role }
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed' });
+    res.status(500).json({ error: 'فشل تسجيل الدخول' });
   }
 });
 
@@ -101,40 +141,40 @@ app.post('/api/auth/register', async (req, res) => {
 
     const existing = await query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
     if (existing.rows.length > 0) {
-      return res.status(400).json({ error: 'Email already registered' });
+      return res.status(400).json({ error: 'البريد الإلكتروني مسجل بالفعل' });
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const result = await query(`
-      INSERT INTO users (name, email, password, phone, address)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO users (name, email, password, phone, address, role)
+      VALUES ($1, $2, $3, $4, $5, 'customer')
       RETURNING id, name, email, role
     `, [name, email.toLowerCase(), hashedPassword, phone, address]);
 
     const user = result.rows[0];
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
 
     res.status(201).json({
-      message: 'Registration successful',
+      message: 'تم إنشاء الحساب بنجاح',
       token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role }
     });
   } catch (error) {
     console.error('Register error:', error);
-    res.status(500).json({ error: 'Registration failed' });
+    res.status(500).json({ error: 'فشل إنشاء الحساب' });
   }
 });
 
 app.get('/api/auth/me', async (req, res) => {
   try {
     const decoded = authenticate(req);
-    if (!decoded) return res.status(401).json({ error: 'Unauthorized' });
+    if (!decoded) return res.status(401).json({ error: 'غير مصرح' });
 
     const result = await query(
       'SELECT id, name, email, phone, address, role FROM users WHERE id = $1',
@@ -142,12 +182,12 @@ app.get('/api/auth/me', async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'المستخدم غير موجود' });
     }
 
     res.json(result.rows[0]);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to get profile' });
+    res.status(500).json({ error: 'فشل جلب البيانات' });
   }
 });
 
@@ -159,9 +199,9 @@ app.get('/api/products', async (req, res) => {
     let queryStr = 'SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE 1=1';
     const params = [];
     
-    if (category) {
+    if (category && category !== 'all') {
       params.push(category);
-      queryStr += ` AND p.category_id = $${params.length}`;
+      queryStr += ` AND (c.slug = $${params.length} OR c.name = $${params.length})`;
     }
     
     queryStr += ' ORDER BY p.created_at DESC';
@@ -170,7 +210,7 @@ app.get('/api/products', async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error('Get products error:', error);
-    res.status(500).json({ error: 'Failed to fetch products' });
+    res.status(500).json({ error: 'فشل تحميل المنتجات' });
   }
 });
 
@@ -182,12 +222,12 @@ app.get('/api/products/:id', async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'المنتج غير موجود' });
     }
 
     res.json(result.rows[0]);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch product' });
+    res.status(500).json({ error: 'فشل تحميل المنتج' });
   }
 });
 
@@ -202,7 +242,7 @@ app.get('/api/categories', async (req, res) => {
     `);
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch categories' });
+    res.status(500).json({ error: 'فشل تحميل الفئات' });
   }
 });
 
@@ -210,44 +250,24 @@ app.get('/api/categories', async (req, res) => {
 
 app.get('/api/settings', async (req, res) => {
   try {
-    const result = await query('SELECT * FROM settings ORDER BY id DESC LIMIT 1');
-    
-    if (result.rows.length === 0) {
-      return res.json({ store_name: 'KB-Medic', delivery_fee: 300 });
+    // محاولة جلب الإعدادات، وإذا فشل نرجع إعدادات افتراضية
+    try {
+        const result = await query('SELECT * FROM settings ORDER BY id DESC LIMIT 1');
+        if (result.rows.length > 0) {
+            return res.json(result.rows[0]);
+        }
+    } catch (e) {
+        console.warn("Settings table might not exist yet.");
     }
     
-    res.json(result.rows[0]);
+    res.json({ store_name: 'KB-Medic', delivery_fee: 300 });
+
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch settings' });
+    res.status(500).json({ error: 'فشل تحميل الإعدادات' });
   }
 });
 
 // ==================== ORDERS ROUTES ====================
-
-app.get('/api/orders', async (req, res) => {
-  try {
-    const decoded = authenticate(req);
-    if (!decoded) return res.status(401).json({ error: 'Unauthorized' });
-
-    let result;
-    if (decoded.email === 'admin@pharmacy.com' || decoded.email === 'admin@kb-medic.com') {
-      result = await query(`
-        SELECT o.*, u.name as customer_name, u.email as customer_email
-        FROM orders o LEFT JOIN users u ON o.user_id = u.id
-        ORDER BY o.created_at DESC
-      `);
-    } else {
-      result = await query(
-        'SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC',
-        [decoded.userId]
-      );
-    }
-
-    res.json(result.rows);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch orders' });
-  }
-});
 
 app.post('/api/orders', async (req, res) => {
   try {
@@ -255,25 +275,27 @@ app.post('/api/orders', async (req, res) => {
     const decoded = authenticate(req);
 
     if (!items || items.length === 0) {
-      return res.status(400).json({ error: 'Order items are required' });
+      return res.status(400).json({ error: 'سلة المشتريات فارغة' });
     }
 
     let total = 0;
     const orderItems = [];
 
+    // التحقق من المنتجات وحساب المجموع
     for (const item of items) {
       const productResult = await query('SELECT id, name, price FROM products WHERE id = $1', [item.product_id]);
       if (productResult.rows.length === 0) {
-        return res.status(400).json({ error: `Product ${item.product_id} not found` });
+        return res.status(400).json({ error: `المنتج رقم ${item.product_id} غير موجود` });
       }
       const product = productResult.rows[0];
-      total += product.price * item.quantity;
+      total += parseFloat(product.price) * parseInt(item.quantity);
       orderItems.push({ ...product, quantity: item.quantity });
     }
 
     const userId = decoded ? decoded.userId : null;
-    const finalName = customer_name || (decoded ? decoded.email : 'Guest');
+    const finalName = customer_name || (decoded ? decoded.name : 'Guest');
 
+    // إنشاء الطلب
     const orderResult = await query(`
       INSERT INTO orders (user_id, total, status, customer_name, customer_phone, customer_address)
       VALUES ($1, $2, 'pending', $3, $4, $5) RETURNING id, created_at
@@ -281,6 +303,7 @@ app.post('/api/orders', async (req, res) => {
 
     const orderId = orderResult.rows[0].id;
 
+    // إضافة عناصر الطلب
     for (const item of orderItems) {
       await query(`
         INSERT INTO order_items (order_id, product_id, product_name, quantity, price)
@@ -289,16 +312,16 @@ app.post('/api/orders', async (req, res) => {
     }
 
     res.status(201).json({
-      message: 'Order created successfully',
+      message: 'تم إنشاء الطلب بنجاح',
       order_id: orderId,
       total,
       created_at: orderResult.rows[0].created_at
     });
   } catch (error) {
     console.error('Create order error:', error);
-    res.status(500).json({ error: 'Failed to create order' });
+    res.status(500).json({ error: 'فشل إنشاء الطلب' });
   }
 });
 
-// Export for Vercel
+// Vercel يحتاج لهذا السطر ليقوم بتشغيل التطبيق
 module.exports = app;
