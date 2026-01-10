@@ -1,35 +1,9 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api-handler.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.js",
-      "use": "@vercel/static"
-    }
-  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api-handler.js"
-    },
-    {
-      "source": "/(.*)\\.(html|css|js|png|jpg|jpeg|svg)",
-      "destination": "/$1.$2"
+      "destination": "/api/index.js"
     },
     {
       "source": "/(.*)",
