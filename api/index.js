@@ -17,7 +17,7 @@ app.use(cors({
 app.use(express.json());
 
 // Database configuration
-const DATABASE_URL = process.env.DATABASE_URL;
+const DATABASE_URL ="postgresql://neondb_owner:npg_lJYpH4e9BQhT@ep-raspy-paper-ah2rqdbq-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require";
 const JWT_SECRET = process.env.JWT_SECRET || 'pharmacy-store-secret-key-2024-secure';
 
 // PostgreSQL client for serverless (Global Variable)
