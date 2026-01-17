@@ -306,7 +306,7 @@
                     const session = JSON.parse(adminSession);
                     if (session.expiresAt && Date.now() < session.expiresAt) {
                         // Session is valid, redirect to admin dashboard
-                        window.location.href = 'customers-admin.html';
+                        window.location.href = 'admin.html';
                         return;
                     } else {
                         // Session expired, clear it
@@ -377,7 +377,7 @@
                     showInfo('تم تسجيل الدخول بنجاح! جاري التحويل...');
 
                     setTimeout(() => {
-                        window.location.href = 'customers-admin.html';
+                        window.location.href = 'admin.html';
                     }, 1500);
                 } else {
                     throw new Error(data.message || 'فشل تسجيل الدخول');
@@ -404,7 +404,7 @@
                     showInfo('تم تسجيل الدخول بنجاح! جاري التحويل...');
 
                     setTimeout(() => {
-                        window.location.href = 'customers-admin.html';
+                        window.location.href = 'admin.html';
                     }, 1500);
                 } else {
                     // Show error
