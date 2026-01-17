@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل دخول المسؤول - KB MEDIC</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.3);
+        }
+
+        .login-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .login-header h1 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Cairo', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .alert.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .alert.success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert.info {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+
+        .loading-container {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-container.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #0ea5e9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        .loading-text {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .security-info {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .security-info p {
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .security-info i {
+            color: #22c55e;
+            margin-left: 5px;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #0ea5e9;
+        }
+
+        .demo-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fef3c7;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: #92400e;
+            text-align: center;
+        }
+
+        .demo-info i {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1>لوحة تحكم KB MEDIC</h1>
+                <p>يرجى تسجيل الدخول للوصول إلى لوحة الإدارة</p>
+            </div>
+
+            <div class="alert error" id="loginError"></div>
+            <div class="alert info" id="loginInfo"></div>
+
+            <!-- Loading State -->
+            <div class="loading-container" id="loadingContainer">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">جاري الاتصال بالخادم...</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">اسم المستخدم</label>
+                    <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">كلمة المرور</label>
+                    <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>تسجيل الدخول</span>
+                </button>
+            </form>
+
+            <div class="security-info">
+                <p><i class="fas fa-lock"></i> نظام آمن ومشفر</p>
+            </div>
+
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-right"></i>
+                <span>العودة إلى الموقع الرئيسي</span>
+            </a>
+
+            <div class="demo-info">
+                <i class="fas fa-info-circle"></i>
+                بيانات الدخول التجريبية: admin / Admin@2025
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:3000'
+            : '';
+
+        // Admin credentials for demo/fallback
+        const DEMO_ADMIN = {
+            username: 'admin',
+            password: 'Admin@2025'
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if already logged in
+            const adminSession = localStorage.getItem('kbMedicAdmin');
+            if (adminSession) {
+                try {
+                    const session = JSON.parse(adminSession);
+                    if (session.expiresAt && Date.now() < session.expiresAt) {
+                        // Session is valid, redirect to admin dashboard
+                        window.location.href = 'customers-admin.html';
+                        return;
+                    } else {
+                        // Session expired, clear it
+                        localStorage.removeItem('kbMedicAdmin');
+                        localStorage.removeItem('kbMedicToken');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('kbMedicAdmin');
+                    localStorage.removeItem('kbMedicToken');
+                }
+            }
+        });
+
+        // Handle login
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('loginError');
+            const infoEl = document.getElementById('loginInfo');
+            const form = document.getElementById('loginForm');
+            const btn = document.getElementById('loginBtn');
+            const loadingEl = document.getElementById('loadingContainer');
+
+            // Validate input
+            if (!username || !password) {
+                showError('يرجى ملء جميع الحقول');
+                return;
+            }
+
+            // Show loading state
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;"></span><span>جاري التحقق...</span>';
+            errorEl.style.display = 'none';
+            infoEl.style.display = 'none';
+            form.style.display = 'none';
+            loadingEl.classList.add('active');
+
+            try {
+                // Try to authenticate via API
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Store authentication data
+                    const session = {
+                        username: username,
+                        token: data.token || 'demo-token',
+                        loginTime: Date.now(),
+                        expiresAt: Date.now() + (8 * 60 * 60 * 1000) // 8 hours
+                    };
+
+                    localStorage.setItem('kbMedicAdmin', JSON.stringify(session));
+                    if (data.token) {
+                        localStorage.setItem('kbMedicToken', data.token);
+                    }
+
+                    // Show success and redirect
+                    loadingEl.classList.remove('active');
+                    showInfo('تم تسجيل الدخول بنجاح! جاري التحويل...');
+
+                    setTimeout(() => {
+                        window.location.href = 'customers-admin.html';
+                    }, 1500);
+                } else {
+                    throw new Error(data.message || 'فشل تسجيل الدخول');
+                }
+            } catch (error) {
+                // API failed, try demo credentials as fallback
+                console.log('API authentication failed, trying demo credentials:', error.message);
+
+                // Check demo credentials
+                if (username === DEMO_ADMIN.username && password === DEMO_ADMIN.password) {
+                    // Demo authentication successful
+                    const session = {
+                        username: username,
+                        token: 'demo-token',
+                        loginTime: Date.now(),
+                        expiresAt: Date.now() + (8 * 60 * 60 * 1000) // 8 hours
+                    };
+
+                    localStorage.setItem('kbMedicAdmin', JSON.stringify(session));
+                    localStorage.setItem('kbMedicToken', 'demo-token');
+
+                    // Show success and redirect
+                    loadingEl.classList.remove('active');
+                    showInfo('تم تسجيل الدخول بنجاح! جاري التحويل...');
+
+                    setTimeout(() => {
+                        window.location.href = 'customers-admin.html';
+                    }, 1500);
+                } else {
+                    // Show error
+                    loadingEl.classList.remove('active');
+                    form.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i><span>تسجيل الدخول</span>';
+
+                    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                        showError('تعذر الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت');
+                    } else {
+                        showError('اسم المستخدم أو كلمة المرور غير صحيحة');
+                    }
+                }
+            }
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('loginError');
+            errorEl.textContent = message;
+            errorEl.className = 'alert error';
+            errorEl.style.display = 'block';
+        }
+
+        function showInfo(message) {
+            const infoEl = document.getElementById('loginInfo');
+            infoEl.textContent = message;
+            infoEl.className = 'alert info';
+            infoEl.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
