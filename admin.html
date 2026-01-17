@@ -802,9 +802,11 @@
         // ===============================
         // Initialization
         // ===============================
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
-            loadAllData();
+        document.addEventListener('DOMContentLoaded', async function() {
+            const isAuthenticated = await checkAuth();
+            if (isAuthenticated) {
+                loadAllData();
+            }
             setupProductForm();
             setupImagePreview();
             updateCartCount();
@@ -887,16 +889,30 @@
         }
 
         async function loadOrders() {
+            const token = localStorage.getItem(AUTH_TOKEN_KEY);
+            
             try {
-                const response = await fetch(`${API_BASE}/orders`);
+                const response = await fetch(`${API_BASE}/orders`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + (token || '')
+                    }
+                });
                 if (response.ok) {
                     const data = await response.json();
                     allOrders = data.orders || [];
+                } else if (response.status === 401) {
+                    throw new Error('Unauthorized');
                 } else {
-                    throw new Error('API not available');
+                    throw new Error('API error');
                 }
             } catch (e) {
+                // Fallback to localStorage
                 const stored = localStorage.getItem(ORDERS_KEY);
+                allOrders = stored ? JSON.parse(stored) : [];
+            }
+            renderOrders();
+            updateOrdersStats();
+        }
                 allOrders = stored ? JSON.parse(stored) : [];
             }
             renderOrders();
