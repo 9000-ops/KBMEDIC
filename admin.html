@@ -3,1415 +3,441 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KB-Medic Admin | لوحة تحكم المسؤول</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>KB MEDIC - متجر المنتجات شبه الصيدلانية</title>
+    <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        :root {
-            --primary: #0e7490;
-            --primary-dark: #0c5c72;
-            --secondary: #10b981;
-            --accent: #f59e0b;
-        }
-        
-        [lang="ar"] { font-family: 'Cairo', sans-serif; }
-        
-        * { scroll-behavior: smooth; }
-        
-        .gradient-primary {
-            background: linear-gradient(135deg, #0e7490 0%, #10b981 100%);
-        }
-        
-        .sidebar-admin {
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-        }
-        
-        .stat-card {
-            transition: all 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .table-row:hover {
-            background: #f1f5f9;
-        }
-        
-        .modal {
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-content {
-            transform: scale(0.9);
-            transition: all 0.3s ease;
-        }
-        
-        .modal.active .modal-content {
-            transform: scale(1);
-        }
-        
-        .admin-nav-link:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        
-        .admin-nav-link.active {
-            background: rgba(14, 116, 144, 0.2);
-            border-right: 3px solid #10b981;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #0e7490;
-            box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.1);
-        }
-        
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #0e7490; border-radius: 4px; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 text-gray-800">
-    <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-4 left-4 z-50 space-y-2"></div>
-
-    <!-- Login Modal -->
-    <div id="login-modal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-user-shield text-white text-2xl"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-gray-800">تسجيل دخول المسؤول</h2>
-            </div>
-            <form id="login-form">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني</label>
-                        <input type="email" id="admin-email" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4" placeholder="admin@kb-medic.com">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">كلمة المرور</label>
-                        <input type="password" id="admin-password" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4" placeholder="********">
-                    </div>
-                    <button type="submit" class="w-full gradient-primary text-white py-3 rounded-xl font-bold hover:shadow-lg transition">
-                        تسجيل الدخول
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-bar-content">
+                <span class="announcement"><i class="fas fa-truck"></i> توصيل مجاني للطلبات فوق 5000 دج</span>
+                <div class="top-bar-actions">
+                    <button class="lang-switch" onclick="toggleLanguage()">
+                        <span class="lang-ar active">العربية</span>
+                        <span class="separator">|</span>
+                        <span class="lang-fr">Français</span>
                     </button>
                 </div>
-            </form>
-            <div class="mt-6 p-4 bg-blue-50 rounded-xl text-sm text-blue-700">
-                <p><strong>ملاحظة:</strong> استخدم admin@kb-medic.com / admin123 للدخول</p>
             </div>
         </div>
     </div>
 
-    <!-- Admin Layout -->
-    <div id="admin-layout" class="hidden">
-        <!-- Sidebar -->
-        <aside class="fixed right-0 top-0 w-72 h-screen sidebar-admin text-white overflow-y-auto">
-            <div class="p-6 border-b border-gray-700">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-cyan-600 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-prescription-bottle-medical text-white text-xl"></i>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <span class="logo-icon"><i class="fas fa-plus-square"></i></span>
+                        <span class="logo-text">KB <span class="highlight">MEDIC</span></span>
+                    </a>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="ابحث عن منتج...">
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+
+                <div class="header-actions">
+                    <div class="user-account">
+                        <a href="#"><i class="far fa-user"></i></a>
                     </div>
-                    <div>
-                        <h1 class="text-xl font-bold">KB-Medic</h1>
-                        <p class="text-xs text-gray-400">لوحة تحكم المسؤول</p>
+                    <div class="wishlist">
+                        <a href="#"><i class="far fa-heart"></i></a>
+                    </div>
+                    <div class="cart-icon" onclick="toggleCart()">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count" id="cartCount">0</span>
                     </div>
                 </div>
             </div>
-            
-            <nav class="p-4 space-y-2">
-                <button onclick="showAdminTab('dashboard')" class="admin-nav-link active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-right transition">
-                    لوحة التحكم
-                </button>
-                <button onclick="showAdminTab('orders')" class="admin-nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-right transition">
-                    إدارة الطلبات
-                </button>
-                <button onclick="showAdminTab('products')" class="admin-nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-right transition">
-                    إدارة المنتجات
-                </button>
-                <button onclick="showAdminTab('categories')" class="admin-nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-right transition">
-                    إدارة الفئات
-                </button>
-                <button onclick="showAdminTab('customers')" class="admin-nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-right transition">
-                    العملاء
-                </button>
-                <button onclick="showAdminTab('messages')" class="admin-nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-right transition">
-                    الرسائل
-                </button>
-                <button onclick="showAdminTab('settings')" class="admin-nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-right transition">
-                    الإعدادات
-                </button>
-            </nav>
-            
-            <div class="p-4 border-t border-gray-700 mt-auto">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-10 h-10 bg-cyan-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-user text-white"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-medium" id="admin-name">Admin</p>
-                        <p class="text-xs text-gray-400">مسؤول النظام</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active" data-i18n="home">الرئيسية</a></li>
+                <li><a href="#products" data-i18n="medicines">الأدوية</a></li>
+                <li><a href="#products" data-i18n="medical_equipment">المعدات الطبية</a></li>
+                <li><a href="#products" data-i18n="beauty">التجميل</a></li>
+                <li><a href="#products" data-i18n="personal_care">العناية الشخصية</a></li>
+                <li><a href="#brands" data-i18n="brands">الماركات</a></li>
+                <li><a href="#contact" data-i18n="contact">اتصل بنا</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-slider">
+            <div class="hero-slide active">
+                <div class="container">
+                    <div class="hero-content">
+                        <span class="hero-badge" data-i18n="free_shipping">توصيل مجاني</span>
+                        <h1 data-i18n="hero_title">أفضل المنتجات شبه الصيدلانية<br>في الجزائر</h1>
+                        <p data-i18n="hero_subtitle">نقدم لكم مجموعة واسعة من المنتجات شبه الصيدلانية<br>مع ضمان الجودة والأصالة</p>
+                        <a href="#products" class="btn btn-primary" data-i18n="shop_now">تسوق الآن</a>
                     </div>
                 </div>
-                <button onclick="adminLogout()" class="w-full bg-red-600 hover:bg-red-700 py-2 rounded-lg text-sm transition flex items-center justify-center gap-2">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>تسجيل الخروج</span>
-                </button>
-                <a href="index.html" class="mt-2 w-full bg-gray-700 hover:bg-gray-600 py-2 rounded-lg text-sm transition flex items-center justify-center gap-2 block">
-                    <i class="fas fa-external-link-alt"></i>
-                    <span>العودة للموقع</span>
+            </div>
+        </div>
+        <div class="hero-indicators">
+            <span class="indicator active"></span>
+            <span class="indicator"></span>
+            <span class="indicator"></span>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h4 data-i18n="fast_delivery">توصيل سريع</h4>
+                        <p data-i18n="fast_delivery_desc">توصيل لجميع الولايات</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h4 data-i18n="quality_guarantee">ضمان الجودة</h4>
+                        <p data-i18n="quality_guarantee_desc">منتجات معتمدة ومضمونة</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h4 data-i18n="support_247">دعم 24/7</h4>
+                        <p data-i18n="support_247_desc">فريق جاهز لمساعدتك</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h4 data-i18n="cash_on_delivery">دفع عند الاستلام</h4>
+                        <p data-i18n="cash_on_delivery_desc">دفع آمن ومضمون</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-i18n="categories">التصنيفات</h2>
+                <a href="#products" class="view-all" data-i18n="view_all">عرض الكل</a>
+            </div>
+            <div class="categories-grid">
+                <a href="#products" class="category-card" data-category="medicines">
+                    <div class="category-icon">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <h3>الأدوية</h3>
+                    <span class="item-count">150+ منتج</span>
+                </a>
+                <a href="#products" class="category-card" data-category="equipment">
+                    <div class="category-icon">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <h3>المعدات الطبية</h3>
+                    <span class="item-count">80+ منتج</span>
+                </a>
+                <a href="#products" class="category-card" data-category="vitamins">
+                    <div class="category-icon">
+                        <i class="fas fa-capsules"></i>
+                    </div>
+                    <h3>الفيتامينات</h3>
+                    <span class="item-count">100+ منتج</span>
+                </a>
+                <a href="#products" class="category-card" data-category="beauty">
+                    <div class="category-icon">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <h3>التجميل</h3>
+                    <span class="item-count">200+ منتج</span>
+                </a>
+                <a href="#products" class="category-card" data-category="personal_care">
+                    <div class="category-icon">
+                        <i class="fas fa-hands-wash"></i>
+                    </div>
+                    <h3>العناية الشخصية</h3>
+                    <span class="item-count">120+ منتج</span>
                 </a>
             </div>
-        </aside>
+        </div>
+    </section>
 
-        <!-- Main Content -->
-        <main class="mr-72 p-8 min-h-screen">
-            <!-- Header -->
-            <header class="flex items-center justify-between mb-8">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-800" id="page-title">لوحة التحكم</h1>
-                    <p class="text-gray-500" id="page-subtitle">مرحباً بك في لوحة تحكم KB-Medic</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm">
-                        <i class="fas fa-calendar-alt text-cyan-600"></i>
-                        <span id="current-date" class="text-sm font-medium"></span>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Dashboard Tab -->
-            <div id="tab-dashboard">
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="stat-card bg-white rounded-2xl p-6 shadow-sm border-r-4 border-cyan-500">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500">إجمالي الطلبات</p>
-                                <p class="text-3xl font-bold text-gray-800" id="stat-orders">0</p>
-                                <p class="text-xs text-green-600 mt-1">+12% هذا الشهر</p>
-                            </div>
-                            <div class="w-14 h-14 bg-cyan-100 rounded-2xl flex items-center justify-center">
-                                <i class="fas fa-shopping-bag text-cyan-600 text-2xl"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-card bg-white rounded-2xl p-6 shadow-sm border-r-4 border-green-500">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500">إجمالي المبيعات</p>
-                                <p class="text-3xl font-bold text-gray-800" id="stat-sales">0</p>
-                                <p class="text-xs text-green-600 mt-1">+8% هذا الشهر</p>
-                            </div>
-                            <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center">
-                                <i class="fas fa-dollar-sign text-green-600 text-2xl"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-card bg-white rounded-2xl p-6 shadow-sm border-r-4 border-yellow-500">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500">إجمالي العملاء</p>
-                                <p class="text-3xl font-bold text-gray-800" id="stat-customers">0</p>
-                                <p class="text-xs text-green-600 mt-1">+5% هذا الشهر</p>
-                            </div>
-                            <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center">
-                                <i class="fas fa-users text-yellow-600 text-2xl"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-card bg-white rounded-2xl p-6 shadow-sm border-r-4 border-purple-500">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500">المنتجات</p>
-                                <p class="text-3xl font-bold text-gray-800" id="stat-products">0</p>
-                                <p class="text-xs text-gray-500 mt-1">منتج في المخزون</p>
-                            </div>
-                            <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center">
-                                <i class="fas fa-pills text-purple-600 text-2xl"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Orders & Quick Stats -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <!-- Recent Orders -->
-                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm overflow-hidden">
-                        <div class="p-6 border-b flex items-center justify-between">
-                            <h3 class="font-bold text-gray-800">أحدث الطلبات</h3>
-                            <button onclick="showAdminTab('orders')" class="text-cyan-600 hover:text-cyan-700 text-sm font-medium">عرض الكل</button>
-                        </div>
-                        <div id="recent-orders-list" class="divide-y max-h-96 overflow-y-auto">
-                            <div class="p-8 text-center">
-                                <i class="fas fa-shopping-bag text-4xl text-gray-300 mb-2"></i>
-                                <p class="text-gray-500">لا توجد طلبات حديثة</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="bg-white rounded-2xl shadow-sm p-6">
-                        <h3 class="font-bold text-gray-800 mb-6">إجراءات سريعة</h3>
-                        <div class="space-y-4">
-                            <button onclick="openProductModal()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 rounded-xl transition flex items-center gap-3">
-                                <i class="fas fa-plus"></i>
-                                <span>إضافة منتج جديد</span>
-                            </button>
-                            <button onclick="showAdminTab('orders')" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl transition flex items-center gap-3">
-                                <i class="fas fa-check-circle"></i>
-                                <span>تأكيد الطلبات المعلقة</span>
-                            </button>
-                            <button onclick="showAdminTab('messages')" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-3 rounded-xl transition flex items-center gap-3">
-                                <i class="fas fa-envelope"></i>
-                                <span>الرد على الرسائل</span>
-                            </button>
-                            <button onclick="exportData()" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl transition flex items-center gap-3">
-                                <i class="fas fa-download"></i>
-                                <span>تصدير البيانات</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Orders by Status Chart -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white rounded-2xl shadow-sm p-6">
-                        <h3 class="font-bold text-gray-800 mb-6">الطلبات حسب الحالة</h3>
-                        <div id="status-chart" class="space-y-4">
-                            <p class="text-gray-500 text-center py-4">لا توجد بيانات</p>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-2xl shadow-sm p-6">
-                        <h3 class="font-bold text-gray-800 mb-6">أفضل المنتجات مبيعاً</h3>
-                        <div id="top-products" class="space-y-4">
-                            <p class="text-gray-500 text-center py-4">لا توجد بيانات</p>
-                        </div>
-                    </div>
+    <!-- Products Section -->
+    <section class="products" id="products">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-i18n="featured_products">المنتجات المميزة</h2>
+                <div class="product-filters">
+                    <button class="filter-btn active" data-filter="all">الكل</button>
+                    <button class="filter-btn" data-filter="medicines">الأدوية</button>
+                    <button class="filter-btn" data-filter="equipment">المعدات الطبية</button>
+                    <button class="filter-btn" data-filter="vitamins">الفيتامينات</button>
+                    <button class="filter-btn" data-filter="beauty">التجميل</button>
+                    <button class="filter-btn" data-filter="personal_care">العناية الشخصية</button>
                 </div>
             </div>
 
-            <!-- Orders Tab -->
-            <div id="tab-orders" class="hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">إدارة الطلبات</h3>
-                    <div class="flex gap-2">
-                        <button onclick="refreshOrders()" class="bg-cyan-600 text-white px-4 py-2 rounded-xl hover:bg-cyan-700 transition flex items-center gap-2">
-                            <i class="fas fa-sync-alt"></i>
-                            <span>تحديث</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
-                    <div class="flex flex-wrap items-center gap-4">
-                        <div class="flex-1 min-w-64">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">البحث</label>
-                            <div class="relative">
-                                <input type="text" id="order-search" oninput="filterOrders()" class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4 pr-12" placeholder="ابحث برقم الطلب أو اسم العميل...">
-                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
-                            <select id="order-status-filter" onchange="filterOrders()" class="bg-gray-100 border border-gray-200 rounded-xl py-3 px-4 min-w-40">
-                                <option value="all">الكل</option>
-                                <option value="pending">قيد الانتظار</option>
-                                <option value="processing">قيد التحضير</option>
-                                <option value="shipping">في الطريق</option>
-                                <option value="delivered">تم التوصيل</option>
-                            </select>
-                        </div>
-                        <div class="pt-6">
-                            <button onclick="resetOrderFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-xl transition">إعادة تعيين</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">رقم الطلب</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">العميل</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">المجموع</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">الحالة</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">التاريخ</th>
-                                    <th class="px-6 py-4 text-center text-sm font-medium text-gray-600">الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orders-table-body" class="divide-y">
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="no-orders-message" class="hidden p-12 text-center">
-                        <i class="fas fa-shopping-bag text-6xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-500">لا توجد طلبات</p>
-                    </div>
-                </div>
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be dynamically loaded here -->
             </div>
 
-            <!-- Products Tab -->
-            <div id="tab-products" class="hidden">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="relative">
-                        <input type="text" id="product-search" oninput="filterProducts()" class="bg-white border border-gray-200 rounded-xl py-3 px-4 pr-12 w-80" placeholder="البحث عن منتج...">
-                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    </div>
-                    <button onclick="openProductModal()" class="gradient-primary text-white px-6 py-3 rounded-xl hover:shadow-lg transition flex items-center gap-2">
-                        <i class="fas fa-plus"></i>
-                        <span>إضافة منتج</span>
-                    </button>
-                </div>
+            <div class="load-more">
+                <button class="btn btn-secondary" onclick="loadMoreProducts()" data-i18n="load_more">المزيد من المنتجات</button>
+            </div>
+        </div>
+    </section>
 
-                <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">#</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">الصورة</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">الاسم</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">الفئة</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">السعر</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">المخزون</th>
-                                    <th class="px-6 py-4 text-center text-sm font-medium text-gray-600">الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="products-table-body" class="divide-y">
-                            </tbody>
-                        </table>
-                    </div>
+    <!-- Brands Section -->
+    <section class="brands" id="brands">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-i18n="our_brands">الماركات المتوفرة</h2>
+            </div>
+            <div class="brands-grid">
+                <div class="brand-card">
+                    <img src="imgs/brands/pharma.svg" alt="Pharma+">
+                </div>
+                <div class="brand-card">
+                    <img src="imgs/brands/medcare.svg" alt="MedCare">
+                </div>
+                <div class="brand-card">
+                    <img src="imgs/brands/biofit.svg" alt="BioFit">
+                </div>
+                <div class="brand-card">
+                    <img src="imgs/brands/vitaplus.svg" alt="VitaPlus">
+                </div>
+                <div class="brand-card">
+                    <img src="imgs/brands/health.svg" alt="Health+">
+                </div>
+                <div class="brand-card">
+                    <img src="imgs/brands/naturemed.svg" alt="NatureMed">
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Categories Tab -->
-            <div id="tab-categories" class="hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">إدارة الفئات</h3>
-                    <button onclick="addCategory()" class="bg-cyan-600 text-white px-4 py-2 rounded-xl hover:bg-cyan-700 transition flex items-center gap-2">
-                        <i class="fas fa-plus"></i>
-                        <span>إضافة فئة جديدة</span>
-                    </button>
+    <!-- Promo Banner -->
+    <section class="promo-banner">
+        <div class="container">
+            <div class="promo-content">
+                <div class="promo-text">
+                    <span class="promo-badge" data-i18n="special_offer">عرض خاص</span>
+                    <h2 data-i18n="promo_title">خصم 20% على<br>جميع منتجات العناية</h2>
+                    <p data-i18n="promo_subtitle">سارع بالطلب قبل نفاد الكمية</p>
+                    <a href="#products" class="btn btn-primary" data-i18n="shop_now">تسوق الآن</a>
                 </div>
-                <div id="categories-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
-            </div>
-
-            <!-- Customers Tab -->
-            <div id="tab-customers" class="hidden">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">قائمة العملاء</h3>
-                <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">#</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">الاسم</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">البريد</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">الهاتف</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">إجمالي المشتريات</th>
-                                    <th class="px-6 py-4 text-right text-sm font-medium text-gray-600">نقاط الولاء</th>
-                                    <th class="px-6 py-4 text-center text-sm font-medium text-gray-600">الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="customers-table-body" class="divide-y">
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="promo-image">
+                    <i class="fas fa-capsules"></i>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Messages Tab -->
-            <div id="tab-messages" class="hidden">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-                        <div class="p-4 border-b bg-gray-50">
-                            <h3 class="font-bold text-gray-800">الرسائل الواردة</h3>
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-i18n="contact_us">اتصل بنا</h2>
+                <p data-i18n="contact_desc">فريقنا جاهز للإجابة على جميع استفساراتك</p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
                         </div>
-                        <div id="messages-list" class="divide-y max-h-[600px] overflow-y-auto">
+                        <div class="contact-details">
+                            <h4 data-i18n="address">العنوان</h4>
+                            <p>الجزائر العاصمة، الجزائر</p>
                         </div>
                     </div>
-                    <div class="lg:col-span-2">
-                        <div id="message-detail" class="bg-white rounded-2xl shadow-sm p-6 hidden">
-                            <div class="flex items-start justify-between mb-6">
-                                <div>
-                                    <h3 id="message-sender" class="text-xl font-bold text-gray-800"></h3>
-                                    <p id="message-email" class="text-sm text-gray-500"></p>
-                                    <p id="message-date" class="text-xs text-gray-400 mt-1"></p>
-                                </div>
-                                <span id="message-status" class="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">غير مقروء</span>
-                            </div>
-                            <div class="border-t pt-6">
-                                <p id="message-content" class="text-gray-700 leading-relaxed"></p>
-                            </div>
-                            <div class="border-t mt-6 pt-6">
-                                <form onsubmit="replyToMessage(event)">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">الرد</label>
-                                    <textarea id="reply-content" rows="4" class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4 resize-none" placeholder="اكتب ردك هنا..."></textarea>
-                                    <div class="flex justify-end gap-3 mt-4">
-                                        <button type="button" onclick="deleteMessage()" class="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition">حذف</button>
-                                        <button type="submit" class="gradient-primary text-white px-6 py-2 rounded-lg hover:shadow-lg transition flex items-center gap-2">
-                                            <i class="fas fa-paper-plane"></i>
-                                            <span>إرسال</span>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone-alt"></i>
                         </div>
-                        <div id="no-message-selected" class="bg-white rounded-2xl shadow-sm p-12 text-center">
-                            <i class="fas fa-envelope-open-text text-6xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500">اختر رسالة لعرضها</p>
+                        <div class="contact-details">
+                            <h4 data-i18n="phone">الهاتف</h4>
+                            <p>+213 555 123 456</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4 data-i18n="email">البريد الإلكتروني</h4>
+                            <p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="23404c4d574240576348414e46474a400d4759">[email&#160;protected]</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>WhatsApp</h4>
+                            <p>+213 555 123 456</p>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Settings Tab -->
-            <div id="tab-settings" class="hidden">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white rounded-2xl shadow-sm p-6">
-                        <h3 class="font-bold text-gray-800 mb-6">الإعدادات العامة</h3>
-                        <form onsubmit="saveSettings(event)" class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">اسم المتجر</label>
-                                <input type="text" id="setting-store-name" class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4" value="KB-Medic">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني</label>
-                                <input type="email" id="setting-email" class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4" value="admin@kb-medic.com">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">رقم الهاتف</label>
-                                <input type="tel" id="setting-phone" class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4" value="+213 555 123 456">
-                            </div>
-                            <button type="submit" class="w-full gradient-primary text-white py-3 rounded-xl font-bold hover:shadow-lg transition">حفظ الإعدادات</button>
-                        </form>
-                    </div>
-                    <div class="bg-white rounded-2xl shadow-sm p-6">
-                        <h3 class="font-bold text-gray-800 mb-6">إعدادات الدفع</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div>
-                                    <p class="font-medium text-gray-800">الدفع عند الاستلام</p>
-                                    <p class="text-sm text-gray-500">تفعيل الدفع عند الاستلام</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="setting-cod" checked class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
-                                </label>
-                            </div>
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div>
-                                    <p class="font-medium text-gray-800">رسوم التوصيل</p>
-                                    <p class="text-sm text-gray-500">تكلفة التوصيل الثابتة</p>
-                                </div>
-                                <input type="number" id="setting-delivery-fee" class="w-32 bg-white border border-gray-200 rounded-xl py-2 px-4 text-center" value="300">
-                            </div>
+                <form class="contact-form" id="contactForm" onsubmit="handleContactSubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name" data-i18n="name">الاسم الكامل</label>
+                            <input type="text" id="name" placeholder="أدخل اسمك الكامل" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" data-i18n="email">البريد الإلكتروني</label>
+                            <input type="email" id="email" placeholder="أدخل بريدك الإلكتروني" required>
                         </div>
                     </div>
-                </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone" data-i18n="phone">رقم الهاتف</label>
+                            <input type="tel" id="phone" placeholder="أدخل رقم هاتفك" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject" data-i18n="subject">الموضوع</label>
+                            <input type="text" id="subject" placeholder="أدخل موضوع الرسالة" required>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="message" data-i18n="message">الرسالة</label>
+                        <textarea id="message" placeholder="اكتب رسالتك هنا..." rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" data-i18n="send_message">إرسال الرسالة</button>
+                </form>
             </div>
-        </main>
-    </div>
+        </div>
+    </section>
 
-    <!-- Product Modal -->
-    <div id="product-modal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-        <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b flex items-center justify-between">
-                <h3 class="text-xl font-bold text-gray-800" id="product-modal-title">إضافة منتج جديد</h3>
-                <button onclick="closeProductModal()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <span class="logo-icon"><i class="fas fa-plus-square"></i></span>
+                        <span class="logo-text">KB <span class="highlight">MEDIC</span></span>
+                    </div>
+                    <p data-i18n="footer_desc">متجركم الموثوق للمنتجات الطبية وشبه الصيدلانية في الجزائر. نلتزم بتقديم أفضل المنتجات مع خدمة توصيل متميزة.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4 data-i18n="quick_links">روابط سريعة</h4>
+                    <ul>
+                        <li><a href="index.html" data-i18n="home">الرئيسية</a></li>
+                        <li><a href="#products" data-i18n="products">المنتجات</a></li>
+                        <li><a href="#brands" data-i18n="brands">الماركات</a></li>
+                        <li><a href="#contact" data-i18n="contact">اتصل بنا</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 data-i18n="categories">التصنيفات</h4>
+                    <ul>
+                        <li><a href="#" data-i18n="medicines">الأدوية</a></li>
+                        <li><a href="#" data-i18n="medical_equipment">المعدات الطبية</a></li>
+                        <li><a href="#" data-i18n="beauty">التجميل</a></li>
+                        <li><a href="#" data-i18n="personal_care">العناية الشخصية</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 data-i18n="contact">اتصل بنا</h4>
+                    <ul class="contact-info-list">
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:0770142125">0770142125</a>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <a href="/cdn-cgi/l/email-protection#e9828b848c8d808ad8d0a98e84888085c78a8684"><span class="__cf_email__" data-cfemail="09626b646c6d606a3830496e64686065276a6664">[email&#160;protected]</span></a>
+                        </li>
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>الجزائر - جميع الولايات</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <form id="product-form" onsubmit="saveProduct(event)" class="p-6 space-y-4">
-                <input type="hidden" id="product-id">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">الاسم بالعربية</label>
-                        <input type="text" id="product-name-ar" required class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4" placeholder="اسم المنتج بالعربية">
-                    </div>
-                    <div class="col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">الاسم بالفرنسية</label>
-                        <input type="text" id="product-name-fr" required class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4" placeholder="Nom du produit">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">السعر (دج)</label>
-                        <input type="number" id="product-price" required class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4" placeholder="0">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">المخزون</label>
-                        <input type="number" id="product-stock" required class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4" placeholder="0">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">الفئة</label>
-                        <select id="product-category" required class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4">
-                            <option value="medicines">الأدوية</option>
-                            <option value="vitamins">الفيتامينات</option>
-                            <option value="skincare">العناية بالبشرة</option>
-                            <option value="baby">منتجات الأطفال</option>
-                            <option value="equipment">الأجهزة الطبية</option>
-                            <option value="hygiene">النظافة</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">الماركة</label>
-                        <input type="text" id="product-brand" required class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4" placeholder="اسم الماركة">
-                    </div>
-                    <div class="col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">رابط الصورة</label>
-                        <input type="url" id="product-image" required class="w-full bg-gray-100 border border-gray-200 rounded-xl py-3 px-4" placeholder="https://...">
-                    </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 KB MEDIC. <span data-i18n="all_rights_reserved">جميع الحقوق محفوظة</span> | 
+                    <a href="terms.html" style="color: #fff; text-decoration: none;">الشروط والأحكام</a> | 
+                    <a href="privacy-policy.html" style="color: #fff; text-decoration: none;">سياسة الخصوصية</a>
+                </p>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fas fa-money-bill-wave"></i>
                 </div>
-                <div class="flex justify-end gap-3 pt-4">
-                    <button type="button" onclick="closeProductModal()" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-300 transition">إلغاء</button>
-                    <button type="submit" class="gradient-primary text-white px-6 py-3 rounded-xl hover:shadow-lg transition flex items-center gap-2">
-                        <i class="fas fa-save"></i>
-                        <span>حفظ</span>
-                    </button>
-                </div>
-            </form>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+    <aside class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3 data-i18n="shopping_cart">سلة التسوق</h3>
+            <button class="close-cart" onclick="toggleCart()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be dynamically loaded here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span data-i18n="total">المجموع</span>
+                <span class="total-price" id="cartTotal">0 دج</span>
+            </div>
+            <button class="btn btn-primary checkout-btn" onclick="checkout()" data-i18n="checkout">إتمام الشراء</button>
+            <button class="btn btn-secondary continue-shopping" onclick="toggleCart()" data-i18n="continue_shopping">متابعة التسوق</button>
+        </div>
+    </aside>
+
+    <!-- Quick View Modal -->
+    <div class="modal" id="quickViewModal">
+        <div class="modal-overlay" onclick="closeQuickView()"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeQuickView()"><i class="fas fa-times"></i></button>
+            <div class="modal-body" id="quickViewContent">
+                <!-- Quick view content will be loaded here -->
+            </div>
         </div>
     </div>
 
-    <script>
-        // Global variables
-        var currentAdmin = null;
-        var currentLang = 'ar';
-
-        // Safe JSON parse function
-        function safeParse(key, defaultValue) {
-            try {
-                var item = localStorage.getItem(key);
-                if (item === null || item === undefined) return defaultValue;
-                return JSON.parse(item);
-            } catch (e) {
-                console.error('Parse error for ' + key + ':', e);
-                return defaultValue;
-            }
-        }
-
-        // Default products
-        function getDefaultProducts() {
-            return [
-                { id: 1, name: { ar: 'دوليبران 500mg', fr: 'Doliprane 500mg' }, price: 250, category: 'medicines', brand: 'Sanofi', image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300', rating: 4.5, stock: 50 },
-                { id: 2, name: { ar: 'فيتامين C 1000mg', fr: 'Vitamine C 1000mg' }, price: 850, category: 'vitamins', brand: 'Vitaforce', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300', rating: 5, stock: 30 },
-                { id: 3, name: { ar: 'كريم مرطب Bioderma', fr: 'Crème Bioderma' }, price: 2500, category: 'skincare', brand: 'Bioderma', image: 'https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?w=300', rating: 4.8, stock: 15 },
-                { id: 4, name: { ar: 'حليب الأطفال Gallia', fr: 'Lait Gallia' }, price: 1800, category: 'baby', brand: 'Gallia', image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=300', rating: 4.7, stock: 25 },
-                { id: 5, name: { ar: 'جهاز قياس الضغط', fr: 'Tensiomètre' }, price: 4500, category: 'equipment', brand: 'Omron', image: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=300', rating: 4.9, stock: 10 },
-                { id: 6, name: { ar: 'واقي شمس SPF50', fr: 'Écran solaire SPF50' }, price: 1950, category: 'skincare', brand: 'La Roche-Posay', image: 'https://images.unsplash.com/photo-1556227834-09f1de7a7d14?w=300', rating: 4.6, stock: 40 }
-            ];
-        }
-
-        // Get products from localStorage
-        function getProducts() {
-            var products = safeParse('kb_medic_products', null);
-            if (!products || !Array.isArray(products) || products.length === 0) {
-                products = getDefaultProducts();
-                localStorage.setItem('kb_medic_products', JSON.stringify(products));
-            }
-            return products;
-        }
-
-        // Save products to localStorage
-        function saveProducts(products) {
-            localStorage.setItem('kb_medic_products', JSON.stringify(products));
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Setup login form
-            var loginForm = document.getElementById('login-form');
-            if (loginForm) {
-                loginForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    performLogin();
-                });
-            }
-            
-            // Listen for localStorage changes from other tabs (sync orders)
-            window.addEventListener('storage', function(e) {
-                if (e.key === 'orders' || e.key === 'users') {
-                    // Refresh data when orders or users are updated
-                    var currentTab = document.querySelector('.admin-nav-link.active');
-                    if (currentTab && currentTab.textContent.includes('الطلبات')) {
-                        loadOrders();
-                    } else if (currentTab && currentTab.textContent.includes('العملاء')) {
-                        loadCustomers();
-                    }
-                    // Always refresh dashboard stats
-                    loadDashboard();
-                }
-            });
-            
-            checkAdminAuth();
-            updateDate();
-        });
-
-        // Check admin authentication
-        function checkAdminAuth() {
-            var adminData = localStorage.getItem('currentAdmin');
-            if (adminData) {
-                try {
-                    currentAdmin = JSON.parse(adminData);
-                    showAdminLayout();
-                } catch (e) {
-                    currentAdmin = null;
-                    document.getElementById('login-modal').classList.add('active');
-                }
-            } else {
-                document.getElementById('login-modal').classList.add('active');
-            }
-        }
-
-        // Perform login
-        function performLogin() {
-            var email = document.getElementById('admin-email').value.trim();
-            var password = document.getElementById('admin-password').value.trim();
-
-            console.log('Login attempt - Email:', email, 'Password length:', password.length);
-
-            if (email === 'admin@kb-medic.com' && password === 'admin123') {
-                currentAdmin = {
-                    id: 1,
-                    name: 'Admin',
-                    email: email,
-                    role: 'admin'
-                };
-                localStorage.setItem('currentAdmin', JSON.stringify(currentAdmin));
-                document.getElementById('login-modal').classList.remove('active');
-                showAdminLayout();
-                showToast('مرحباً بك أيها المسؤول!', 'success');
-            } else {
-                showToast('بيانات الدخول غير صحيحة', 'error');
-                console.log('Login failed. Expected: admin@kb-medic.com / admin123');
-            }
-        }
-
-        // Logout
-        function adminLogout() {
-            currentAdmin = null;
-            localStorage.removeItem('currentAdmin');
-            document.getElementById('admin-layout').classList.add('hidden');
-            document.getElementById('login-modal').classList.add('active');
-            showToast('تم تسجيل الخروج بنجاح', 'info');
-        }
-
-        // Show admin layout
-        function showAdminLayout() {
-            document.getElementById('login-modal').classList.remove('active');
-            document.getElementById('admin-layout').classList.remove('hidden');
-            document.getElementById('admin-name').textContent = currentAdmin.name;
-            loadDashboard();
-        }
-
-        // Show admin tab
-        function showAdminTab(tab) {
-            // Update navigation
-            var navLinks = document.querySelectorAll('.admin-nav-link');
-            navLinks.forEach(function(link) {
-                link.classList.remove('active');
-            });
-            
-            var tabMapping = {
-                'dashboard': 0,
-                'orders': 1,
-                'products': 2,
-                'categories': 3,
-                'customers': 4,
-                'messages': 5,
-                'settings': 6
-            };
-            if (navLinks[tabMapping[tab]]) {
-                navLinks[tabMapping[tab]].classList.add('active');
-            }
-
-            // Hide all tabs
-            var allTabs = document.querySelectorAll('[id^="tab-"]');
-            allTabs.forEach(function(t) {
-                t.classList.add('hidden');
-            });
-
-            // Show selected tab
-            var tabElement = document.getElementById('tab-' + tab);
-            if (tabElement) {
-                tabElement.classList.remove('hidden');
-            }
-
-            // Update page title
-            var titles = {
-                dashboard: 'لوحة التحكم',
-                orders: 'إدارة الطلبات',
-                products: 'إدارة المنتجات',
-                categories: 'إدارة الفئات',
-                customers: 'العملاء',
-                messages: 'الرسائل',
-                settings: 'الإعدادات'
-            };
-
-            document.getElementById('page-title').textContent = titles[tab] || tab;
-            document.getElementById('page-subtitle').textContent = titles[tab] || tab;
-
-            // Load tab content
-            switch(tab) {
-                case 'dashboard': loadDashboard(); break;
-                case 'orders': 
-                    loadOrders(); 
-                    loadDashboard(); // Update dashboard stats when viewing orders
-                    break;
-                case 'products': loadProducts(); break;
-                case 'categories': loadCategories(); break;
-                case 'customers': loadCustomers(); break;
-                case 'messages': loadMessages(); break;
-                case 'settings': loadSettings(); break;
-            }
-        }
-
-        // Update date
-        function updateDate() {
-            var now = new Date();
-            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            var dateEl = document.getElementById('current-date');
-            if (dateEl) {
-                dateEl.textContent = now.toLocaleDateString('ar-EG', options);
-            }
-        }
-
-        // Load dashboard
-        function loadDashboard() {
-            try {
-                var orders = safeParse('orders', []);
-                var users = safeParse('users', []);
-                var products = getProducts();
-
-                var totalSales = 0;
-                orders.forEach(function(order) {
-                    totalSales += (order.total || 0);
-                });
-
-                // Update stat elements with error handling
-                var statOrders = document.getElementById('stat-orders');
-                var statSales = document.getElementById('stat-sales');
-                var statCustomers = document.getElementById('stat-customers');
-                var statProducts = document.getElementById('stat-products');
-
-                if (statOrders) statOrders.textContent = orders.length;
-                if (statSales) statSales.textContent = formatPrice(totalSales);
-                if (statCustomers) statCustomers.textContent = users.length;
-                if (statProducts) statProducts.textContent = products.length;
-
-                // Status chart
-                var statusCounts = {
-                    pending: orders.filter(function(o) { return o.status === 'pending'; }).length,
-                    processing: orders.filter(function(o) { return o.status === 'processing'; }).length,
-                    shipping: orders.filter(function(o) { return o.status === 'shipping'; }).length,
-                    delivered: orders.filter(function(o) { return o.status === 'delivered'; }).length
-                };
-
-                var totalStatus = orders.length || 1;
-                var statusChart = document.getElementById('status-chart');
-                if (statusChart) {
-                    var statusHtml = '';
-                    Object.keys(statusCounts).forEach(function(status) {
-                        statusHtml += '<div class="flex items-center gap-4">';
-                        statusHtml += '<span class="w-32 text-sm text-gray-600">' + getStatusText(status) + '</span>';
-                        statusHtml += '<div class="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">';
-                        statusHtml += '<div class="bg-' + getStatusColor(status) + ' h-full rounded-full" style="width:' + ((statusCounts[status] / totalStatus) * 100) + '%"></div>';
-                        statusHtml += '</div><span class="w-8 text-sm font-medium">' + statusCounts[status] + '</span></div>';
-                    });
-                    if (orders.length === 0) {
-                        statusHtml = '<p class="text-gray-500 text-center py-4">لا توجد بيانات</p>';
-                    }
-                    statusChart.innerHTML = statusHtml;
-                }
-
-                // Top products
-                var topProductsEl = document.getElementById('top-products');
-                if (topProductsEl) {
-                    if (products.length > 0) {
-                        topProductsEl.innerHTML = products.slice(0, 5).map(function(p, i) {
-                            return '<div class="flex items-center gap-3"><span class="w-8 h-8 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 font-bold">' + (i + 1) + '</span><div class="flex-1"><p class="font-medium text-gray-800">' + (p.name?.ar || 'منتج') + '</p><p class="text-sm text-gray-500">' + p.stock + ' في المخزون</p></div></div>';
-                        }).join('');
-                    } else {
-                        topProductsEl.innerHTML = '<p class="text-gray-500 text-center py-4">لا توجد بيانات</p>';
-                    }
-                }
-            } catch (e) {
-                console.error('Error loading dashboard:', e);
-            }
-        }
-
-        // Load orders
-        function loadOrders() {
-            var orders = safeParse('orders', []);
-            var tbody = document.getElementById('orders-table-body');
-            var noOrders = document.getElementById('no-orders-message');
-
-            if (!tbody) return;
-
-            if (orders.length === 0) {
-                tbody.innerHTML = '';
-                if (noOrders) noOrders.classList.remove('hidden');
-            } else {
-                if (noOrders) noOrders.classList.add('hidden');
-                tbody.innerHTML = orders.map(function(order) {
-                    return '<tr class="table-row">' +
-                        '<td class="px-6 py-4 font-medium">#' + order.id + '</td>' +
-                        '<td class="px-6 py-4">' + (order.shipping?.name || 'عميل') + '</td>' +
-                        '<td class="px-6 py-4 font-bold text-cyan-600">' + formatPrice(order.total) + '</td>' +
-                        '<td class="px-6 py-4">' +
-                            '<select onchange="updateOrderStatus(\'' + order.id + '\', this.value)" class="bg-' + getStatusColor(order.status) + '-100 text-' + getStatusColor(order.status) + '-700 px-3 py-1 rounded-full text-sm font-medium border-0 cursor-pointer">' +
-                                '<option value="pending" ' + (order.status === 'pending' ? 'selected' : '') + '>قيد الانتظار</option>' +
-                                '<option value="processing" ' + (order.status === 'processing' ? 'selected' : '') + '>قيد التحضير</option>' +
-                                '<option value="shipping" ' + (order.status === 'shipping' ? 'selected' : '') + '>في الطريق</option>' +
-                                '<option value="delivered" ' + (order.status === 'delivered' ? 'selected' : '') + '>تم التوصيل</option>' +
-                            '</select>' +
-                        '</td>' +
-                        '<td class="px-6 py-4 text-gray-500">' + new Date(order.date).toLocaleDateString() + '</td>' +
-                        '<td class="px-6 py-4">' +
-                            '<div class="flex items-center justify-center gap-2">' +
-                                '<button onclick="viewOrderDetails(\'' + order.id + '\')" class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center hover:bg-cyan-200 transition"><i class="fas fa-eye"></i></button>' +
-                                '<button onclick="deleteOrder(\'' + order.id + '\')" class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button>' +
-                            '</div>' +
-                        '</td>' +
-                    '</tr>';
-                }).join('');
-            }
-            
-            // Update dashboard stats after loading orders
-            loadDashboard();
-        }
-
-        // Update order status
-        function updateOrderStatus(orderId, newStatus) {
-            var orders = safeParse('orders', []);
-            // Convert both to string for comparison (handles both numeric and string IDs)
-            var orderIdStr = String(orderId);
-            var orderIndex = orders.findIndex(function(o) { return String(o.id) === orderIdStr; });
-            
-            if (orderIndex > -1) {
-                orders[orderIndex].status = newStatus;
-                orders[orderIndex].statusHistory = orders[orderIndex].statusHistory || [];
-                orders[orderIndex].statusHistory.push({
-                    status: newStatus,
-                    date: new Date().toISOString()
-                });
-                
-                localStorage.setItem('orders', JSON.stringify(orders));
-                showToast('تم تحديث حالة الطلب بنجاح', 'success');
-                loadOrders();
-                loadDashboard();
-            } else {
-                showToast('لم يتم العثور على الطلب', 'error');
-                console.log('Order not found. Looking for:', orderIdStr, 'Available IDs:', orders.map(o => o.id));
-            }
-        }
-
-        // View order details
-        function viewOrderDetails(orderId) {
-            var orders = safeParse('orders', []);
-            var orderIdStr = String(orderId);
-            var order = orders.find(function(o) { return String(o.id) === orderIdStr; });
-            
-            if (order) {
-                alert('تفاصيل الطلب #' + order.id + '\n\nالعميل: ' + (order.shipping?.name || 'عميل') + '\nالحالة: ' + getStatusText(order.status) + '\nالتاريخ: ' + new Date(order.date).toLocaleDateString());
-            }
-        }
-
-        // Filter orders
-        function filterOrders() {
-            var search = document.getElementById('order-search').value.toLowerCase();
-            var status = document.getElementById('order-status-filter').value;
-            var orders = safeParse('orders', []);
-
-            if (search) {
-                orders = orders.filter(function(o) {
-                    return o.id.toString().includes(search) || (o.shipping?.name && o.shipping.name.toLowerCase().includes(search));
-                });
-            }
-
-            if (status !== 'all') {
-                orders = orders.filter(function(o) { return o.status === status; });
-            }
-
-            renderOrdersTable(orders);
-        }
-
-        function renderOrdersTable(orders) {
-            var tbody = document.getElementById('orders-table-body');
-            var noOrders = document.getElementById('no-orders-message');
-
-            if (!tbody) return;
-
-            if (orders.length === 0) {
-                tbody.innerHTML = '';
-                if (noOrders) noOrders.classList.remove('hidden');
-                return;
-            }
-
-            if (noOrders) noOrders.classList.add('hidden');
-            tbody.innerHTML = orders.map(function(order) {
-                return '<tr class="table-row">' +
-                    '<td class="px-6 py-4 font-medium">#' + order.id + '</td>' +
-                    '<td class="px-6 py-4">' + (order.shipping?.name || 'عميل') + '</td>' +
-                    '<td class="px-6 py-4 font-bold text-cyan-600">' + formatPrice(order.total) + '</td>' +
-                    '<td class="px-6 py-4">' +
-                        '<select onchange="updateOrderStatus(\'' + order.id + '\', this.value)" class="bg-' + getStatusColor(order.status) + '-100 text-' + getStatusColor(order.status) + '-700 px-3 py-1 rounded-full text-sm font-medium border-0 cursor-pointer">' +
-                            '<option value="pending" ' + (order.status === 'pending' ? 'selected' : '') + '>قيد الانتظار</option>' +
-                            '<option value="processing" ' + (order.status === 'processing' ? 'selected' : '') + '>قيد التحضير</option>' +
-                            '<option value="shipping" ' + (order.status === 'shipping' ? 'selected' : '') + '>في الطريق</option>' +
-                            '<option value="delivered" ' + (order.status === 'delivered' ? 'selected' : '') + '>تم التوصيل</option>' +
-                        '</select>' +
-                    '</td>' +
-                    '<td class="px-6 py-4 text-gray-500">' + new Date(order.date).toLocaleDateString() + '</td>' +
-                    '<td class="px-6 py-4">' +
-                        '<div class="flex items-center justify-center gap-2">' +
-                            '<button onclick="viewOrderDetails(\'' + order.id + '\')" class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center hover:bg-cyan-200 transition"><i class="fas fa-eye"></i></button>' +
-                            '<button onclick="deleteOrder(\'' + order.id + '\')" class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button>' +
-                        '</div>' +
-                    '</td>' +
-                '</tr>';
-            }).join('');
-        }
-
-        function resetOrderFilters() {
-            document.getElementById('order-search').value = '';
-            document.getElementById('order-status-filter').value = 'all';
-            loadOrders();
-        }
-        
-        // Refresh orders from localStorage
-        function refreshOrders() {
-            loadOrders();
-            loadDashboard();
-            showToast('تم تحديث البيانات', 'success');
-        }
-
-        function deleteOrder(id) {
-            if (confirm('هل أنت متأكد من حذف هذا الطلب؟')) {
-                var orders = safeParse('orders', []);
-                var idStr = String(id);
-                orders = orders.filter(function(o) { return String(o.id) !== idStr; });
-                localStorage.setItem('orders', JSON.stringify(orders));
-                showToast('تم حذف الطلب بنجاح', 'success');
-                loadOrders();
-                loadDashboard();
-            }
-        }
-
-        // Load products
-        function loadProducts() {
-            var products = getProducts();
-            var tbody = document.getElementById('products-table-body');
-            
-            if (products.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">لا توجد منتجات</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = products.map(function(p, i) {
-                return '<tr class="table-row"><td class="px-6 py-4">' + (i + 1) + '</td><td class="px-6 py-4"><img src="' + p.image + '" class="w-12 h-12 rounded-lg object-cover" alt=""></td><td class="px-6 py-4 font-medium">' + (p.name?.ar || p.name?.fr || '') + '</td><td class="px-6 py-4">' + getCategoryName(p.category) + '</td><td class="px-6 py-4"><span class="font-bold">' + formatPrice(p.price) + '</span></td><td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs ' + (p.stock > 20 ? 'bg-green-100 text-green-700' : p.stock > 0 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') + '">' + p.stock + '</span></td><td class="px-6 py-4"><div class="flex items-center justify-center gap-2"><button onclick="editProduct(' + p.id + ')" class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center hover:bg-cyan-200 transition"><i class="fas fa-edit"></i></button><button onclick="deleteProduct(' + p.id + ')" class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button></div></td></tr>';
-            }).join('');
-        }
-
-        function filterProducts() {
-            var search = document.getElementById('product-search').value.toLowerCase();
-            var products = getProducts();
-
-            var filtered = products;
-            if (search) {
-                filtered = products.filter(function(p) {
-                    return (p.name?.ar && p.name.ar.toLowerCase().includes(search)) ||
-                           (p.name?.fr && p.name.fr.toLowerCase().includes(search)) ||
-                           (p.brand && p.brand.toLowerCase().includes(search));
-                });
-            }
-
-            var tbody = document.getElementById('products-table-body');
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">لا توجد منتجات</td></tr>';
-            } else {
-                tbody.innerHTML = filtered.map(function(p, i) {
-                    return '<tr class="table-row"><td class="px-6 py-4">' + (i + 1) + '</td><td class="px-6 py-4"><img src="' + p.image + '" class="w-12 h-12 rounded-lg object-cover" alt=""></td><td class="px-6 py-4 font-medium">' + (p.name?.ar || p.name?.fr || '') + '</td><td class="px-6 py-4">' + getCategoryName(p.category) + '</td><td class="px-6 py-4">' + formatPrice(p.price) + '</td><td class="px-6 py-4">' + p.stock + '</td><td class="px-6 py-4"><div class="flex items-center justify-center gap-2"><button onclick="editProduct(' + p.id + ')" class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center hover:bg-cyan-200 transition"><i class="fas fa-edit"></i></button><button onclick="deleteProduct(' + p.id + ')" class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button></div></td></tr>';
-                }).join('');
-            }
-        }
-
-        function openProductModal(product) {
-            document.getElementById('product-modal-title').textContent = product ? 'تعديل المنتج' : 'إضافة منتج جديد';
-            document.getElementById('product-id').value = product?.id || '';
-            document.getElementById('product-name-ar').value = product?.name?.ar || '';
-            document.getElementById('product-name-fr').value = product?.name?.fr || '';
-            document.getElementById('product-price').value = product?.price || '';
-            document.getElementById('product-stock').value = product?.stock || '';
-            document.getElementById('product-category').value = product?.category || 'medicines';
-            document.getElementById('product-brand').value = product?.brand || '';
-            document.getElementById('product-image').value = product?.image || '';
-            document.getElementById('product-modal').classList.add('active');
-        }
-
-        function closeProductModal() {
-            document.getElementById('product-modal').classList.remove('active');
-            document.getElementById('product-form').reset();
-        }
-
-        function saveProduct(e) {
-            e.preventDefault();
-            
-            var products = getProducts();
-            var id = document.getElementById('product-id').value;
-            
-            var productData = {
-                name: {
-                    ar: document.getElementById('product-name-ar').value,
-                    fr: document.getElementById('product-name-fr').value
-                },
-                price: parseInt(document.getElementById('product-price').value) || 0,
-                stock: parseInt(document.getElementById('product-stock').value) || 0,
-                category: document.getElementById('product-category').value,
-                brand: document.getElementById('product-brand').value,
-                image: document.getElementById('product-image').value,
-                rating: 4.5
-            };
-
-            if (id) {
-                var index = products.findIndex(function(p) { return p.id === parseInt(id); });
-                if (index > -1) {
-                    products[index] = Object.assign({}, products[index], productData);
-                }
-            } else {
-                var maxId = 0;
-                products.forEach(function(p) { if (p.id > maxId) maxId = p.id; });
-                productData.id = maxId + 1;
-                products.push(productData);
-            }
-
-            saveProducts(products);
-            closeProductModal();
-            loadProducts();
-            showToast(id ? 'تم تحديث المنتج بنجاح' : 'تم إضافة المنتج بنجاح', 'success');
-        }
-
-        function editProduct(id) {
-            var products = getProducts();
-            var product = products.find(function(p) { return p.id === id; });
-            if (product) {
-                openProductModal(product);
-            }
-        }
-
-        function deleteProduct(id) {
-            if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-                var products = getProducts();
-                products = products.filter(function(p) { return p.id !== id; });
-                saveProducts(products);
-                loadProducts();
-                showToast('تم حذف المنتج بنجاح', 'success');
-            }
-        }
-
-        // Load categories
-        function loadCategories() {
-            var categories = safeParse('categories', [
-                { id: 1, name: 'الأدوية', icon: 'fa-pills', color: '#0e7490' },
-                { id: 2, name: 'الفيتامينات', icon: 'fa-capsules', color: '#f59e0b' },
-                { id: 3, name: 'العناية بالبشرة', icon: 'fa-spa', color: '#ec4899' },
-                { id: 4, name: 'منتجات الأطفال', icon: 'fa-baby', color: '#3b82f6' },
-                { id: 5, name: 'الأجهزة الطبية', icon: 'fa-heartbeat', color: '#10b981' },
-                { id: 6, name: 'النظافة', icon: 'fa-hand-sparkles', color: '#8b5cf6' }
-            ]);
-
-            var grid = document.getElementById('categories-grid');
-            grid.innerHTML = categories.map(function(cat) {
-                return '<div class="bg-white rounded-2xl shadow-sm p-6">' +
-                    '<div class="flex items-start justify-between mb-4">' +
-                    '<div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:' + cat.color + '20">' +
-                    '<i class="fas ' + cat.icon + ' text-xl" style="color:' + cat.color + '"></i>' +
-                    '</div>' +
-                    '<div class="flex gap-2">' +
-                    '<button onclick="editCategory(' + cat.id + ')" class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center hover:bg-cyan-200 transition"><i class="fas fa-edit"></i></button>' +
-                    '<button onclick="deleteCategory(' + cat.id + ')" class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button>' +
-                    '</div>' +
-                    '</div>' +
-                    '<h4 class="font-bold text-gray-800 mb-1">' + cat.name + '</h4>' +
-                    '<p class="text-sm text-gray-500">فئة متجر</p>' +
-                    '</div>';
-            }).join('');
-        }
-
-        // Edit category
-        function editCategory(id) {
-            var categories = safeParse('categories', []);
-            var cat = categories.find(function(c) { return c.id === id; });
-            if (!cat) return;
-            
-            var newName = prompt('أدخل الاسم الجديد للفئة:', cat.name);
-            if (newName && newName.trim()) {
-                cat.name = newName.trim();
-                localStorage.setItem('categories', JSON.stringify(categories));
-                loadCategories();
-                showToast('تم تعديل الفئة بنجاح', 'success');
-            }
-        }
-
-        // Delete category
-        function deleteCategory(id) {
-            if (confirm('هل أنت متأكد من حذف هذه الفئة؟')) {
-                var categories = safeParse('categories', []);
-                categories = categories.filter(function(c) { return c.id !== id; });
-                localStorage.setItem('categories', JSON.stringify(categories));
-                loadCategories();
-                showToast('تم حذف الفئة بنجاح', 'success');
-            }
-        }
-
-        // Add new category
-        function addCategory() {
-            var name = prompt('أدخل اسم الفئة الجديدة:');
-            if (name && name.trim()) {
-                var categories = safeParse('categories', []);
-                var newId = categories.length > 0 ? Math.max.apply(Math, categories.map(function(c) { return c.id; })) + 1 : 1;
-                var icons = ['fa-pills', 'fa-capsules', 'fa-spa', 'fa-baby', 'fa-heartbeat', 'fa-hand-sparkles', 'fa-tooth', 'fa-first-aid', 'fa-thermometer', 'fa-bandage'];
-                var colors = ['#0e7490', '#f59e0b', '#ec4899', '#3b82f6', '#10b981', '#8b5cf6', '#ef4444', '#14b8a6', '#f97316', '#6366f1'];
-                var randomIndex = Math.floor(Math.random() * icons.length);
-                
-                categories.push({
-                    id: newId,
-                    name: name.trim(),
-                    icon: icons[randomIndex],
-                    color: colors[randomIndex]
-                });
-                
-                localStorage.setItem('categories', JSON.stringify(categories));
-                loadCategories();
-                showToast('تم إضافة الفئة بنجاح', 'success');
-            }
-        }
-
-        // Load customers
-        function loadCustomers() {
-            var users = safeParse('users', [{ id: 1, name: 'مستخدم تجريبي', email: 'user@test.com', phone: '+213666789012', loyaltyPoints: 150 }]);
-            var orders = safeParse('orders', []);
-            var tbody = document.getElementById('customers-table-body');
-            
-            tbody.innerHTML = users.map(function(u, i) {
-                // Calculate total sales for this customer
-                var userOrders = orders.filter(function(o) { return o.userId === u.id; });
-                var totalSales = userOrders.reduce(function(sum, o) { return sum + (o.total || 0); }, 0);
-                var ordersCount = userOrders.length;
-                
-                return '<tr class="table-row">' +
-                    '<td class="px-6 py-4">' + (i + 1) + '</td>' +
-                    '<td class="px-6 py-4 font-medium">' + u.name + '</td>' +
-                    '<td class="px-6 py-4">' + u.email + '</td>' +
-                    '<td class="px-6 py-4">' + (u.phone || '-') + '</td>' +
-                    '<td class="px-6 py-4 font-bold text-cyan-600">' + formatPrice(totalSales) + '</td>' +
-                    '<td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700 font-medium">' + (u.loyaltyPoints || 0) + '</span></td>' +
-                    '<td class="px-6 py-4">' +
-                    '<div class="flex items-center justify-center gap-2">' +
-                    '<button onclick="viewCustomer(' + u.id + ')" class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center hover:bg-cyan-200 transition"><i class="fas fa-eye"></i></button>' +
-                    '<button onclick="deleteCustomer(' + u.id + ')" class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button>' +
-                    '</div>' +
-                    '</td>' +
-                    '</tr>';
-            }).join('');
-        }
-
-        // View customer details
-        function viewCustomer(id) {
-            var users = safeParse('users', []);
-            var orders = safeParse('orders', []);
-            var user = users.find(function(u) { return u.id === id; });
-            
-            if (!user) {
-                showToast('العميل غير موجود', 'error');
-                return;
-            }
-            
-            var userOrders = orders.filter(function(o) { return o.userId === id; });
-            var totalSales = userOrders.reduce(function(sum, o) { return sum + (o.total || 0); }, 0);
-            
-            alert('بيانات العميل:\n\nالاسم: ' + user.name + '\nالبريد: ' + user.email + '\nالهاتف: ' + (user.phone || '-') + '\n\nإجمالي المشتريات: ' + formatPrice(totalSales) + '\nعدد الطلبات: ' + userOrders.length + '\nنقاط الولاء: ' + (user.loyaltyPoints || 0));
-        }
-
-        // Delete customer
-        function deleteCustomer(id) {
-            if (confirm('هل أنت متأكد من حذف هذا العميل؟ لن يتم حذف طلباته.')) {
-                var users = safeParse('users', []);
-                users = users.filter(function(u) { return u.id !== id; });
-                localStorage.setItem('users', JSON.stringify(users));
-                loadCustomers();
-                showToast('تم حذف العميل بنجاح', 'success');
-            }
-        }
-
-        // Load messages
-        function loadMessages() {
-            var messages = safeParse('messages', [
-                { id: 1, name: 'أحمد محمد', email: 'ahmed@test.com', message: 'السلام عليكم، أريد الاستفسار عن توصيل المنتجات', date: new Date().toISOString(), read: false },
-                { id: 2, name: 'سارة علي', email: 'sara@test.com', message: 'ما هي أوقات العمل لديكم؟', date: new Date().toISOString(), read: true }
-            ]);
-
-            var list = document.getElementById('messages-list');
-            list.innerHTML = messages.map(function(msg) {
-                return '<div onclick="showMessage(' + msg.id + ')" class="p-4 hover:bg-gray-50 cursor-pointer transition ' + (!msg.read ? 'bg-blue-50' : '') + '"><div class="flex items-start gap-3"><div class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center flex-shrink-0"><i class="fas fa-user text-cyan-600"></i></div><div class="flex-1 min-w-0"><div class="flex items-center justify-between"><p class="font-medium text-gray-800">' + msg.name + '</p><span class="text-xs text-gray-400">' + new Date(msg.date).toLocaleDateString() + '</span></div><p class="text-sm text-gray-600 truncate">' + msg.message + '</p></div></div></div>';
-            }).join('');
-        }
-
-        function showMessage(id) {
-            var messages = safeParse('messages', []);
-            var msg = messages.find(function(m) { return m.id === id; });
-            if (!msg) return;
-
-            msg.read = true;
-            localStorage.setItem('messages', JSON.stringify(messages));
-
-            document.getElementById('message-sender').textContent = msg.name;
-            document.getElementById('message-email').textContent = msg.email;
-            document.getElementById('message-date').textContent = new Date(msg.date).toLocaleDateString();
-            document.getElementById('message-content').textContent = msg.message;
-
-            document.getElementById('no-message-selected').classList.add('hidden');
-            document.getElementById('message-detail').classList.remove('hidden');
-
-            loadMessages();
-        }
-
-        function replyToMessage(e) {
-            e.preventDefault();
-            var reply = document.getElementById('reply-content').value;
-            if (reply.trim()) {
-                showToast('تم إرسال الرد بنجاح', 'success');
-                document.getElementById('reply-content').value = '';
-            }
-        }
-
-        function deleteMessage() {
-            showToast('تم حذف الرسالة', 'success');
-            document.getElementById('message-detail').classList.add('hidden');
-            document.getElementById('no-message-selected').classList.remove('hidden');
-        }
-
-        // Load settings
-        function loadSettings() {
-            var settings = safeParse('settings', {
-                storeName: 'KB-Medic',
-                email: 'admin@kb-medic.com',
-                phone: '+213 555 123 456',
-                codEnabled: true,
-                deliveryFee: 300
-            });
-
-            // Update form fields
-            var storeName = document.getElementById('setting-store-name');
-            var email = document.getElementById('setting-email');
-            var phone = document.getElementById('setting-phone');
-            var cod = document.getElementById('setting-cod');
-            var deliveryFee = document.getElementById('setting-delivery-fee');
-
-            if (storeName) storeName.value = settings.storeName || '';
-            if (email) email.value = settings.email || '';
-            if (phone) phone.value = settings.phone || '';
-            if (cod) cod.checked = settings.codEnabled !== false;
-            if (deliveryFee) deliveryFee.value = settings.deliveryFee || 0;
-        }
-
-        function saveSettings(e) {
-            e.preventDefault();
-            
-            var settings = {
-                storeName: document.getElementById('setting-store-name').value,
-                email: document.getElementById('setting-email').value,
-                phone: document.getElementById('setting-phone').value,
-                codEnabled: document.getElementById('setting-cod').checked,
-                deliveryFee: parseInt(document.getElementById('setting-delivery-fee').value) || 0
-            };
-            
-            localStorage.setItem('settings', JSON.stringify(settings));
-            showToast('تم حفظ الإعدادات بنجاح', 'success');
-        }
-
-        // Utility functions
-        function formatPrice(price) {
-            return (price || 0).toLocaleString() + ' دج';
-        }
-
-        function getStatusColor(status) {
-            var colors = {
-                pending: 'yellow',
-                processing: 'blue',
-                shipping: 'purple',
-                delivered: 'green'
-            };
-            return colors[status] || 'gray';
-        }
-
-        function getStatusText(status) {
-            var texts = {
-                pending: 'قيد الانتظار',
-                processing: 'قيد التحضير',
-                shipping: 'في الطريق',
-                delivered: 'تم التوصيل'
-            };
-            return texts[status] || status;
-        }
-
-        function getCategoryName(category) {
-            var names = {
-                medicines: 'الأدوية',
-                vitamins: 'الفيتامينات',
-                skincare: 'العناية بالبشرة',
-                baby: 'منتجات الأطفال',
-                equipment: 'الأجهزة الطبية',
-                hygiene: 'النظافة'
-            };
-            return names[category] || category;
-        }
-
-        function exportData() {
-            var data = {
-                orders: safeParse('orders', []),
-                products: getProducts(),
-                users: safeParse('users', [])
-            };
-
-            var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = 'kb-medic-export-' + new Date().toISOString().split('T')[0] + '.json';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('تم تصدير البيانات بنجاح', 'success');
-        }
-
-        function showToast(message, type) {
-            var container = document.getElementById('toast-container');
-            var colors = {
-                success: 'bg-green-500',
-                error: 'bg-red-500',
-                info: 'bg-blue-500'
-            };
-
-            var toast = document.createElement('div');
-            toast.className = 'toast ' + colors[type] + ' text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3';
-            var icon = type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle';
-            toast.innerHTML = '<i class="fas fa-' + icon + '"></i><span>' + message + '</span>';
-            container.appendChild(toast);
-            setTimeout(function() { toast.remove(); }, 3000);
-        }
-    </script>
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage"></span>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/main.js"></script>
 </body>
 </html>
